@@ -1,2 +1,2 @@
 # taggy-base
-taggy helps you to tag your content
+the main package for taggy
