@@ -1,0 +1,20 @@
+{
+  "tags": [
+    {
+      "name": "mountainbike",
+      "words": ["berg", "fully", "mtb"]
+    },
+    {
+      "name": "rennrad",
+      "words": ["straße", "dura ace", "tour de france"]
+    },
+    {
+      "name": "trekking/reise",
+      "words": ["trekking", "reise", "langstrecke", "gepäcktasche"]
+    },
+    {
+      "name": "urban",
+      "words": ["pendeln", "fixed gear", "pegs"]
+    }
+  ]
+}

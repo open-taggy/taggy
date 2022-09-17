@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "@b1tsteller/taggy": "file:../taggy"
+  },
+  "scripts": {
+    "build": "tsc -w",
+    "start": "node lib/index.js"
+  },
+  "devDependencies": {
+    "typescript": "^4.8.3"
+  }
+}
