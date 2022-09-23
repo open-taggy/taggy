@@ -1,6 +1,7 @@
 {
   "dependencies": {
-    "@b1tsteller/taggy": "file:../taggy"
+    "@b1tsteller/taggy": "file:../taggy",
+    "@clipperhouse/jargon": "^0.2.0"
   },
   "scripts": {
     "build": "tsc -w",

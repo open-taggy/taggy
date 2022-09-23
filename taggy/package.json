@@ -25,6 +25,8 @@
   },
   "homepage": "https://github.com/open-taggy/taggy-base#readme",
   "dependencies": {
+    "@clipperhouse/jargon": "^0.2.0",
+    "openthesaurus": "^1.0.2",
     "wink-tokenizer": "^5.3.0"
   },
   "devDependencies": {

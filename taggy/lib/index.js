@@ -26,8 +26,17 @@ exports.taggy = void 0;
 const readline = __importStar(require("readline"));
 const wink_tokenizer_1 = __importDefault(require("wink-tokenizer"));
 const stopwords_iso_1 = __importDefault(require("stopwords-iso")); // object of stopwords for multiple languages
+// import stopwordsDE from de; // german stopwords
+const normalize_for_search_1 = __importDefault(require("normalize-for-search"));
 const fs_1 = __importDefault(require("fs"));
-const winkTokenizer = new wink_tokenizer_1.default();
+//import synonyms from "germansynonyms";
+// import openthesaurus from "openthesaurus";
+const openthesaurus = require("openthesaurus");
+let finalInput = [];
+let glossarEnriched = [];
+// OPTIONAL
+// include wink-nlp (lemmatizing)
+// OPTIONAL
 exports.taggy = {
     taggy: () => {
         // create shell input
@@ -38,7 +47,13 @@ exports.taggy = {
         const stopwordsDE = stopwords_iso_1.default.de;
         rl.question("Input: ", (input) => {
             console.log(`Tokens for "${input}":`);
+            // optional lemmatizer for tech words?
+            //let lemmatized = null;
+            //lemmatized = jargon.Lemmatize(input, stackexchange);
+            //console.log(lemmatized.toString());
+            // optional lemmatizer for tech words?
             // tokenize input
+            const winkTokenizer = new wink_tokenizer_1.default();
             let tokenizedItems = winkTokenizer.tokenize(input);
             let tokenizedWords = tokenizedItems.filter((item) => {
                 return item.tag === "word";
@@ -47,15 +62,30 @@ exports.taggy = {
             console.log(tokenizedWords);
             console.log(stopwordsDE);
             // filter out german stopwords
-            let tokenizedWordsNoStop = tokenizedWords.filter((item) => !stopwordsDE.includes(item.value.toLowerCase()));
-            // create array with only lowercase
+            let tokenizedWordsNoStop = tokenizedWords.filter((item) => !stopwordsDE.includes(item.value));
+            // create array with only lowercase and normalized (remove ö and stuff)
             let tokenizedValues = [];
             for (const element of tokenizedWordsNoStop) {
-                tokenizedValues.push(element.value.toLowerCase());
+                tokenizedValues.push(normalize_for_search_1.default(element.value));
+                // optional lemmatizer for tech words?
+                // lemmatized = jargon.Lemmatize(element.value, stackexchange);
+                // console.log(lemmatized.toString());
+                // optional lemmatizer for tech words?
             }
-            console.log(tokenizedWordsNoStop);
+            console.log(tokenizedValues);
             // console.log(tokenizedValues);
-            console.log(process.cwd());
+            let enrichedInputValues = [];
+            // get baseforms from openthesaurus?
+            for (const word of tokenizedValues) {
+                console.log("trying for", word);
+                openthesaurus.get(word).then((response) => {
+                    if (response && response.baseforms) {
+                        console.log(response.baseforms);
+                        enrichedInputValues.push(response.baseforms);
+                    }
+                });
+            }
+            // get baseforms from openthesaurus?
             // read glossar data
             let rawData = fs_1.default.readFileSync("../taggy/data/glossar.json");
             let glossar = JSON.parse(rawData.toString());
@@ -63,12 +93,23 @@ exports.taggy = {
             let glossarTags = glossar.tags;
             // look for matches in glossar
             for (const tag of glossarTags) {
-                console.log(tag.name + ": ");
                 for (const word of tag.words) {
-                    console.log("- " + word);
-                    if (tokenizedValues.includes(word.toLowerCase())) {
-                        console.log("-> MATCH");
-                    }
+                    console.log(word);
+                    glossarEnriched.push(word);
+                    // get baseforms from openthesaurus?
+                    openthesaurus.get(word).then((response) => {
+                        if (response && response.baseforms) {
+                            console.log(response.baseforms);
+                            glossarEnriched.push(response.baseforms);
+                        }
+                        // get baseforms from openthesaurus?
+                    });
+                }
+            }
+            for (const element of glossarEnriched) {
+                console.log("- " + element);
+                if (finalInput.includes(normalize_for_search_1.default(element))) {
+                    console.log("-> MATCH");
                 }
             }
             rl.close();
