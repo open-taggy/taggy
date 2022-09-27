@@ -1,3 +1,4 @@
 export declare const taggy: {
-    taggy: () => void;
+    taggyVanilla: (input: string) => string[];
+    taggyCLI: () => void;
 };
