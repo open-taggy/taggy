@@ -89,12 +89,12 @@ function processInput(input) {
     // get baseforms from openthesaurus?
     for (const word of tokenizedValues) {
         enrichedInputValues.push(word);
-        openthesaurus.get(word).then((response) => {
-            if (response && response.baseforms) {
-                // console.log(response.baseforms);
-                enrichedInputValues.push(response.baseforms);
-            }
-        });
+        // openthesaurus.get(word).then((response: any) => {
+        //   if (response && response.baseforms) {
+        //     // console.log(response.baseforms);
+        //     enrichedInputValues.push(response.baseforms);
+        //   }
+        // });
     }
     // get baseforms from openthesaurus?
     // read glossar data
