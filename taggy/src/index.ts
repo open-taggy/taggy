@@ -6,6 +6,7 @@ import normalizer from "normalize-for-search";
 import jargon from "@clipperhouse/jargon";
 import stackexchange from "@clipperhouse/jargon/stackexchange"; // a dictionary
 import fs from "fs";
+import "regenerator-runtime/runtime";
 
 // let glossarData = require("../taggy/data/glossar.json");
 let glossarData = require("../data/glossar.json");
@@ -49,7 +50,7 @@ export const taggy = {
   },
 };
 
-function processInput(input: string): string[] {
+async function processInput(input: string): Promise<string[]> {
   // tokenize input
   const winkTokenizer = new tokenizer();
   const stopwordsDE = stopwords.de;
@@ -84,16 +85,16 @@ function processInput(input: string): string[] {
   let enrichedInputValues: string[] = [];
 
   // get baseforms from openthesaurus?
-  for (const word of tokenizedValues) {
+  for await (const word of tokenizedValues) {
     enrichedInputValues.push(word);
+    console.log("STILL");
 
-    
-    // openthesaurus.get(word).then((response: any) => {
-    //   if (response && response.baseforms) {
-    //     // console.log(response.baseforms);
-    //     enrichedInputValues.push(response.baseforms);
-    //   }
-    // });
+    await openthesaurus.get(word).then((response: any) => {
+      if (response && response.baseforms) {
+        console.log(response.baseforms);
+        enrichedInputValues.push(response.baseforms);
+      }
+    });
   }
 
   // get baseforms from openthesaurus?

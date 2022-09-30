@@ -28,6 +28,7 @@ const wink_tokenizer_1 = __importDefault(require("wink-tokenizer"));
 const stopwords_iso_1 = __importDefault(require("stopwords-iso")); // object of stopwords for multiple languages
 // import stopwordsDE from de; // german stopwords
 const normalize_for_search_1 = __importDefault(require("normalize-for-search"));
+require("regenerator-runtime/runtime");
 // let glossarData = require("../taggy/data/glossar.json");
 let glossarData = require("../data/glossar.json");
 // import * as glossarData from "../taggy/data/glossar.json";
@@ -61,7 +62,7 @@ exports.taggy = {
         });
     },
 };
-function processInput(input) {
+async function processInput(input) {
     // tokenize input
     const winkTokenizer = new wink_tokenizer_1.default();
     const stopwordsDE = stopwords_iso_1.default.de;
@@ -87,14 +88,15 @@ function processInput(input) {
     // console.log(tokenizedValues);
     let enrichedInputValues = [];
     // get baseforms from openthesaurus?
-    for (const word of tokenizedValues) {
+    for await (const word of tokenizedValues) {
         enrichedInputValues.push(word);
-        // openthesaurus.get(word).then((response: any) => {
-        //   if (response && response.baseforms) {
-        //     // console.log(response.baseforms);
-        //     enrichedInputValues.push(response.baseforms);
-        //   }
-        // });
+        console.log("STILL");
+        await openthesaurus.get(word).then((response) => {
+            if (response && response.baseforms) {
+                console.log(response.baseforms);
+                enrichedInputValues.push(response.baseforms);
+            }
+        });
     }
     // get baseforms from openthesaurus?
     // read glossar data
