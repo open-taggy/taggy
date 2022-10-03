@@ -7,6 +7,7 @@ import jargon from "@clipperhouse/jargon";
 import stackexchange from "@clipperhouse/jargon/stackexchange"; // a dictionary
 import fs from "fs";
 import "regenerator-runtime/runtime";
+import Tagify from "@yaireo/tagify";
 
 // let glossarData = require("../taggy/data/glossar.json");
 let glossarData = require("../data/glossar.json");
@@ -18,6 +19,7 @@ const openthesaurus = require("openthesaurus");
 
 let finalInput: string[] = [];
 let glossarEnriched: string[] = [];
+let tagify: Tagify;
 
 // OPTIONAL
 // include wink-nlp (lemmatizing)
@@ -26,6 +28,15 @@ let glossarEnriched: string[] = [];
 export const taggy = {
   taggyVanilla: (input: string) => {
     return processInput(input);
+  },
+  createTagify: (inputElement: HTMLInputElement) => {
+    console.log(inputElement);
+    tagify = new Tagify(inputElement);
+    return tagify;
+  },
+  addTags: (input: string) => {
+    tagify.addTags(input);
+    return tagify;
   },
   taggyCLI: () => {
     // create shell input
@@ -84,18 +95,23 @@ async function processInput(input: string): Promise<string[]> {
 
   let enrichedInputValues: string[] = [];
 
-  // get baseforms from openthesaurus?
-  for await (const word of tokenizedValues) {
-    enrichedInputValues.push(word);
-    console.log("STILL");
+  // don't call openthesaurus-API too often (-> results in too many requests error)
+  if (tokenizedValues.length < 20) {
+    // get baseforms from openthesaurus?
+    for await (const word of tokenizedValues) {
+      // enrichedInputValues.push(word);
+      console.log("CALLING OPENTHESAURUS API");
 
-    await openthesaurus.get(word).then((response: any) => {
-      if (response && response.baseforms) {
-        console.log(response.baseforms);
-        enrichedInputValues.push(response.baseforms);
-      }
-    });
+      await openthesaurus.get(word).then((response: any) => {
+        if (response && response.baseforms) {
+          console.log(response.baseforms);
+          enrichedInputValues.push(response.baseforms);
+        }
+      });
+    }
   }
+
+  enrichedInputValues = enrichedInputValues.concat(tokenizedValues);
 
   // get baseforms from openthesaurus?
 

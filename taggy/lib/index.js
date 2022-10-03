@@ -29,6 +29,7 @@ const stopwords_iso_1 = __importDefault(require("stopwords-iso")); // object of 
 // import stopwordsDE from de; // german stopwords
 const normalize_for_search_1 = __importDefault(require("normalize-for-search"));
 require("regenerator-runtime/runtime");
+const tagify_1 = __importDefault(require("@yaireo/tagify"));
 // let glossarData = require("../taggy/data/glossar.json");
 let glossarData = require("../data/glossar.json");
 // import * as glossarData from "../taggy/data/glossar.json";
@@ -37,12 +38,22 @@ let glossarData = require("../data/glossar.json");
 const openthesaurus = require("openthesaurus");
 let finalInput = [];
 let glossarEnriched = [];
+let tagify;
 // OPTIONAL
 // include wink-nlp (lemmatizing)
 // OPTIONAL
 exports.taggy = {
     taggyVanilla: (input) => {
         return processInput(input);
+    },
+    createTagify: (inputElement) => {
+        console.log(inputElement);
+        tagify = new tagify_1.default(inputElement);
+        return tagify;
+    },
+    addTags: (input) => {
+        tagify.addTags(input);
+        return tagify;
     },
     taggyCLI: () => {
         // create shell input
@@ -87,17 +98,21 @@ async function processInput(input) {
     // console.log(tokenizedValues);
     // console.log(tokenizedValues);
     let enrichedInputValues = [];
-    // get baseforms from openthesaurus?
-    for await (const word of tokenizedValues) {
-        enrichedInputValues.push(word);
-        console.log("STILL");
-        await openthesaurus.get(word).then((response) => {
-            if (response && response.baseforms) {
-                console.log(response.baseforms);
-                enrichedInputValues.push(response.baseforms);
-            }
-        });
+    // don't call openthesaurus-API too often (-> results in too many requests error)
+    if (tokenizedValues.length < 20) {
+        // get baseforms from openthesaurus?
+        for await (const word of tokenizedValues) {
+            // enrichedInputValues.push(word);
+            console.log("CALLING OPENTHESAURUS API");
+            await openthesaurus.get(word).then((response) => {
+                if (response && response.baseforms) {
+                    console.log(response.baseforms);
+                    enrichedInputValues.push(response.baseforms);
+                }
+            });
+        }
     }
+    enrichedInputValues = enrichedInputValues.concat(tokenizedValues);
     // get baseforms from openthesaurus?
     // read glossar data
     // let rawData = fs.readFileSync("../taggy/data/glossar.json");

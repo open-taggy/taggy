@@ -26,6 +26,7 @@
   "homepage": "https://github.com/open-taggy/taggy-base#readme",
   "dependencies": {
     "@clipperhouse/jargon": "^0.2.0",
+    "@yaireo/tagify": "^4.16.4",
     "openthesaurus": "^1.0.2",
     "regenerator-runtime": "^0.13.9",
     "wink-tokenizer": "^5.3.0"
@@ -34,6 +35,7 @@
     "@types/node": "^18.7.18",
     "@types/normalize-for-search": "^2.1.0",
     "@types/wink-tokenizer": "^4.0.3",
+    "@types/yaireo__tagify": "^4.16.0",
     "normalize-for-search": "^2.1.0",
     "stopwords-iso": "^1.1.0"
   }
