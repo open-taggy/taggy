@@ -8,6 +8,7 @@ import stackexchange from "@clipperhouse/jargon/stackexchange"; // a dictionary
 import fs from "fs";
 import "regenerator-runtime/runtime";
 import Tagify from "@yaireo/tagify";
+import { countBy, orderBy, groupBy } from "lodash";
 
 // let glossarData = require("../taggy/data/glossar.json");
 let glossarData = require("../data/glossar.json");
@@ -30,7 +31,7 @@ export const taggy = {
     return processInput(input);
   },
   createTagify: (inputElement: HTMLInputElement) => {
-    console.log(inputElement);
+    // console.log(inputElement);
     tagify = new Tagify(inputElement);
     return tagify;
   },
@@ -90,8 +91,11 @@ async function processInput(input: string): Promise<string[]> {
     // optional lemmatizer for tech words?
   }
 
-  // console.log(tokenizedValues);
-  // console.log(tokenizedValues);
+  console.log("Tokenized Values");
+  console.log(tokenizedValues);
+
+  console.log("COUNTED");
+  console.log(countBy(tokenizedValues));
 
   let enrichedInputValues: string[] = [];
 
@@ -111,7 +115,10 @@ async function processInput(input: string): Promise<string[]> {
     }
   }
 
-  enrichedInputValues = enrichedInputValues.concat(tokenizedValues);
+  // flat out arrays
+  enrichedInputValues = enrichedInputValues
+    .flat()
+    .concat(tokenizedValues.flat());
 
   // get baseforms from openthesaurus?
 
@@ -137,8 +144,17 @@ async function processInput(input: string): Promise<string[]> {
   console.log("GLOSSARENRICHED");
   console.log(glossarEnriched);
 
-  console.log("ENRICHEDINPUTVALUE");
+  console.log("ENRICHEDINPUTVALUES");
   console.log(enrichedInputValues);
+  console.log("ENRICHEDINPUTVALUES SORTED");
+  console.log(enrichedInputValues.sort());
+  console.log("ENRICHEDINPUTVALUES COUNTBY");
+  console.log(countBy(enrichedInputValues));
+  console.log(groupBy(countBy(enrichedInputValues)));
+  console.log("ENRICHEDINPUTVALUES MOSTFREQUENT");
+  console.log(getMostFrequent(enrichedInputValues));
+  console.log("ENRICHEDINPUTVALUES MODE ARRAY");
+  console.log(modeArray(enrichedInputValues));
 
   let returnValues: string[] = [];
 
@@ -169,4 +185,37 @@ function enrichWithOpenThesaurus(inputArray: string[]) {
   }
 
   return enrichedArray;
+}
+
+function getMostFrequent(arr: any) {
+  const hashmap = arr.reduce((acc: any, val: any) => {
+    acc[val] = (acc[val] || 0) + 1;
+    return acc;
+  }, {});
+  return Object.keys(hashmap).reduce((a, b) =>
+    hashmap[a] > hashmap[b] ? a : b
+  );
+}
+
+function modeArray(array: any) {
+  if (array.length == 0) return null;
+  var modeMap: any = {},
+    maxCount = 1,
+    modes = [];
+
+  for (var i = 0; i < array.length; i++) {
+    var el = array[i];
+
+    if (modeMap[el] == null) modeMap[el] = 1;
+    else modeMap[el]++;
+
+    if (modeMap[el] > maxCount) {
+      modes = [el];
+      maxCount = modeMap[el];
+    } else if (modeMap[el] == maxCount) {
+      modes.push(el);
+      maxCount = modeMap[el];
+    }
+  }
+  return modes;
 }

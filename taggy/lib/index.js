@@ -30,6 +30,7 @@ const stopwords_iso_1 = __importDefault(require("stopwords-iso")); // object of 
 const normalize_for_search_1 = __importDefault(require("normalize-for-search"));
 require("regenerator-runtime/runtime");
 const tagify_1 = __importDefault(require("@yaireo/tagify"));
+const lodash_1 = require("lodash");
 // let glossarData = require("../taggy/data/glossar.json");
 let glossarData = require("../data/glossar.json");
 // import * as glossarData from "../taggy/data/glossar.json";
@@ -47,7 +48,7 @@ exports.taggy = {
         return processInput(input);
     },
     createTagify: (inputElement) => {
-        console.log(inputElement);
+        // console.log(inputElement);
         tagify = new tagify_1.default(inputElement);
         return tagify;
     },
@@ -95,8 +96,10 @@ async function processInput(input) {
         // console.log(lemmatized.toString());
         // optional lemmatizer for tech words?
     }
-    // console.log(tokenizedValues);
-    // console.log(tokenizedValues);
+    console.log("Tokenized Values");
+    console.log(tokenizedValues);
+    console.log("COUNTED");
+    console.log(lodash_1.countBy(tokenizedValues));
     let enrichedInputValues = [];
     // don't call openthesaurus-API too often (-> results in too many requests error)
     if (tokenizedValues.length < 20) {
@@ -112,7 +115,10 @@ async function processInput(input) {
             });
         }
     }
-    enrichedInputValues = enrichedInputValues.concat(tokenizedValues);
+    // flat out arrays
+    enrichedInputValues = enrichedInputValues
+        .flat()
+        .concat(tokenizedValues.flat());
     // get baseforms from openthesaurus?
     // read glossar data
     // let rawData = fs.readFileSync("../taggy/data/glossar.json");
@@ -131,8 +137,17 @@ async function processInput(input) {
     let glossarEnriched = glossarTags;
     console.log("GLOSSARENRICHED");
     console.log(glossarEnriched);
-    console.log("ENRICHEDINPUTVALUE");
+    console.log("ENRICHEDINPUTVALUES");
     console.log(enrichedInputValues);
+    console.log("ENRICHEDINPUTVALUES SORTED");
+    console.log(enrichedInputValues.sort());
+    console.log("ENRICHEDINPUTVALUES COUNTBY");
+    console.log(lodash_1.countBy(enrichedInputValues));
+    console.log(lodash_1.groupBy(lodash_1.countBy(enrichedInputValues)));
+    console.log("ENRICHEDINPUTVALUES MOSTFREQUENT");
+    console.log(getMostFrequent(enrichedInputValues));
+    console.log("ENRICHEDINPUTVALUES MODE ARRAY");
+    console.log(modeArray(enrichedInputValues));
     let returnValues = [];
     // look for matches in glossar
     for (const word of glossarEnriched) {
@@ -157,4 +172,32 @@ function enrichWithOpenThesaurus(inputArray) {
         });
     }
     return enrichedArray;
+}
+function getMostFrequent(arr) {
+    const hashmap = arr.reduce((acc, val) => {
+        acc[val] = (acc[val] || 0) + 1;
+        return acc;
+    }, {});
+    return Object.keys(hashmap).reduce((a, b) => hashmap[a] > hashmap[b] ? a : b);
+}
+function modeArray(array) {
+    if (array.length == 0)
+        return null;
+    var modeMap = {}, maxCount = 1, modes = [];
+    for (var i = 0; i < array.length; i++) {
+        var el = array[i];
+        if (modeMap[el] == null)
+            modeMap[el] = 1;
+        else
+            modeMap[el]++;
+        if (modeMap[el] > maxCount) {
+            modes = [el];
+            maxCount = modeMap[el];
+        }
+        else if (modeMap[el] == maxCount) {
+            modes.push(el);
+            maxCount = modeMap[el];
+        }
+    }
+    return modes;
 }
