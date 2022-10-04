@@ -40,21 +40,29 @@ const openthesaurus = require("openthesaurus");
 let finalInput = [];
 let glossarEnriched = [];
 let tagify;
+let mostFrequent = [];
 // OPTIONAL
 // include wink-nlp (lemmatizing)
 // OPTIONAL
 exports.taggy = {
-    taggyVanilla: (input) => {
-        return processInput(input);
-    },
     createTagify: (inputElement) => {
         // console.log(inputElement);
         tagify = new tagify_1.default(inputElement);
         return tagify;
     },
+    processInput: (input) => {
+        return processInput(input);
+    },
     addTags: (input) => {
         tagify.addTags(input);
         return tagify;
+    },
+    deleteTags: () => {
+        console.log("called deleteTags");
+        tagify.removeTags();
+    },
+    getMostFrequent: () => {
+        return mostFrequent;
     },
     taggyCLI: () => {
         // create shell input
@@ -101,6 +109,7 @@ async function processInput(input) {
     console.log("COUNTED");
     console.log(lodash_1.countBy(tokenizedValues));
     let enrichedInputValues = [];
+    mostFrequent = [];
     // don't call openthesaurus-API too often (-> results in too many requests error)
     if (tokenizedValues.length < 20) {
         // get baseforms from openthesaurus?
@@ -139,15 +148,13 @@ async function processInput(input) {
     console.log(glossarEnriched);
     console.log("ENRICHEDINPUTVALUES");
     console.log(enrichedInputValues);
-    console.log("ENRICHEDINPUTVALUES SORTED");
-    console.log(enrichedInputValues.sort());
-    console.log("ENRICHEDINPUTVALUES COUNTBY");
-    console.log(lodash_1.countBy(enrichedInputValues));
-    console.log(lodash_1.groupBy(lodash_1.countBy(enrichedInputValues)));
-    console.log("ENRICHEDINPUTVALUES MOSTFREQUENT");
-    console.log(getMostFrequent(enrichedInputValues));
-    console.log("ENRICHEDINPUTVALUES MODE ARRAY");
-    console.log(modeArray(enrichedInputValues));
+    // console.log("ENRICHEDINPUTVALUES SORTED");
+    // console.log(enrichedInputValues.sort());
+    // console.log("ENRICHEDINPUTVALUES COUNTBY");
+    // console.log(countBy(enrichedInputValues));
+    // console.log(groupBy(countBy(enrichedInputValues)));
+    // console.log("ENRICHEDINPUTVALUES MOSTFREQUENT");
+    // console.log(getMostFrequent(enrichedInputValues));
     let returnValues = [];
     // look for matches in glossar
     for (const word of glossarEnriched) {
@@ -157,7 +164,19 @@ async function processInput(input) {
             returnValues.push(word);
         }
     }
-    return returnValues;
+    // matches with most occurencies
+    mostFrequent = modeArray(returnValues);
+    console.log("MOSTFREQUENT MODE ARRAY");
+    console.log(mostFrequent);
+    // most frequent single words in text
+    console.log("ENRICHEDINPUTVALUES MODE ARRAY");
+    console.log(modeArray(enrichedInputValues));
+    if (modeArray(enrichedInputValues)?.length == 1) {
+        return modeArray(enrichedInputValues);
+    }
+    console.log("RETURN VALUES", returnValues);
+    let returnArray = [lodash_1.sample(returnValues)];
+    return returnArray;
 }
 function enrichWithOpenThesaurus(inputArray) {
     let enrichedArray = [];

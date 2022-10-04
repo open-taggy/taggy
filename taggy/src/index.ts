@@ -8,7 +8,7 @@ import stackexchange from "@clipperhouse/jargon/stackexchange"; // a dictionary
 import fs from "fs";
 import "regenerator-runtime/runtime";
 import Tagify from "@yaireo/tagify";
-import { countBy, orderBy, groupBy } from "lodash";
+import { countBy, sample, orderBy, groupBy } from "lodash";
 
 // let glossarData = require("../taggy/data/glossar.json");
 let glossarData = require("../data/glossar.json");
@@ -21,23 +21,31 @@ const openthesaurus = require("openthesaurus");
 let finalInput: string[] = [];
 let glossarEnriched: string[] = [];
 let tagify: Tagify;
+let mostFrequent: string[] = [];
 
 // OPTIONAL
 // include wink-nlp (lemmatizing)
 // OPTIONAL
 
 export const taggy = {
-  taggyVanilla: (input: string) => {
-    return processInput(input);
-  },
   createTagify: (inputElement: HTMLInputElement) => {
     // console.log(inputElement);
     tagify = new Tagify(inputElement);
     return tagify;
   },
+  processInput: (input: string) => {
+    return processInput(input);
+  },
   addTags: (input: string) => {
     tagify.addTags(input);
     return tagify;
+  },
+  deleteTags: () => {
+    console.log("called deleteTags");
+    tagify.removeTags();
+  },
+  getMostFrequent: () => {
+    return mostFrequent;
   },
   taggyCLI: () => {
     // create shell input
@@ -98,6 +106,7 @@ async function processInput(input: string): Promise<string[]> {
   console.log(countBy(tokenizedValues));
 
   let enrichedInputValues: string[] = [];
+  mostFrequent = [];
 
   // don't call openthesaurus-API too often (-> results in too many requests error)
   if (tokenizedValues.length < 20) {
@@ -146,15 +155,13 @@ async function processInput(input: string): Promise<string[]> {
 
   console.log("ENRICHEDINPUTVALUES");
   console.log(enrichedInputValues);
-  console.log("ENRICHEDINPUTVALUES SORTED");
-  console.log(enrichedInputValues.sort());
-  console.log("ENRICHEDINPUTVALUES COUNTBY");
-  console.log(countBy(enrichedInputValues));
-  console.log(groupBy(countBy(enrichedInputValues)));
-  console.log("ENRICHEDINPUTVALUES MOSTFREQUENT");
-  console.log(getMostFrequent(enrichedInputValues));
-  console.log("ENRICHEDINPUTVALUES MODE ARRAY");
-  console.log(modeArray(enrichedInputValues));
+  // console.log("ENRICHEDINPUTVALUES SORTED");
+  // console.log(enrichedInputValues.sort());
+  // console.log("ENRICHEDINPUTVALUES COUNTBY");
+  // console.log(countBy(enrichedInputValues));
+  // console.log(groupBy(countBy(enrichedInputValues)));
+  // console.log("ENRICHEDINPUTVALUES MOSTFREQUENT");
+  // console.log(getMostFrequent(enrichedInputValues));
 
   let returnValues: string[] = [];
 
@@ -167,7 +174,22 @@ async function processInput(input: string): Promise<string[]> {
     }
   }
 
-  return returnValues;
+  // matches with most occurencies
+  mostFrequent = modeArray(returnValues)!;
+  console.log("MOSTFREQUENT MODE ARRAY");
+  console.log(mostFrequent);
+
+  // most frequent single words in text
+  console.log("ENRICHEDINPUTVALUES MODE ARRAY");
+  console.log(modeArray(enrichedInputValues));
+
+  if (modeArray(enrichedInputValues)?.length == 1) {
+    return modeArray(enrichedInputValues)!;
+  }
+
+  console.log("RETURN VALUES", returnValues);
+  let returnArray: string[] = [sample(returnValues)!];
+  return returnArray;
 }
 
 function enrichWithOpenThesaurus(inputArray: string[]) {
