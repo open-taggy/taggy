@@ -102,6 +102,8 @@ async function processInput(input: string): Promise<string[]> {
   console.log("Tokenized Values");
   console.log(tokenizedValues);
 
+  if (tokenizedValues.length < 2) return [];
+
   console.log("COUNTED");
   console.log(countBy(tokenizedValues));
 
@@ -166,13 +168,19 @@ async function processInput(input: string): Promise<string[]> {
   let returnValues: string[] = [];
 
   // look for matches in glossar
-  for (const word of glossarEnriched) {
+  for (const glossarValue of glossarEnriched) {
     // console.log("- " + word);
-    if (enrichedInputValues.includes(normalizer(word))) {
-      console.log("-> MATCH");
-      returnValues.push(word);
+
+    for (const inputValue of enrichedInputValues) {
+      if (inputValue == glossarValue) returnValues.push(inputValue);
     }
+    // if (enrichedInputValues.includes(normalizer(word))) {
+    //   console.log("-> MATCH");
+    //   returnValues.push(word);
+    // }
   }
+
+  console.log("returnValues before", returnValues);
 
   // matches with most occurencies
   mostFrequent = modeArray(returnValues)!;
@@ -180,12 +188,12 @@ async function processInput(input: string): Promise<string[]> {
   console.log(mostFrequent);
 
   // most frequent single words in text
-  console.log("ENRICHEDINPUTVALUES MODE ARRAY");
-  console.log(modeArray(enrichedInputValues));
+  // console.log("ENRICHEDINPUTVALUES MODE ARRAY");
+  // console.log(modeArray(enrichedInputValues));
 
-  if (modeArray(enrichedInputValues)?.length == 1) {
-    return modeArray(enrichedInputValues)!;
-  }
+  // if (modeArray(enrichedInputValues)?.length == 1) {
+  //   return modeArray(enrichedInputValues)!;
+  // }
 
   console.log("RETURN VALUES", returnValues);
   let returnArray: string[] = [sample(returnValues)!];

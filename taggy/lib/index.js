@@ -106,6 +106,8 @@ async function processInput(input) {
     }
     console.log("Tokenized Values");
     console.log(tokenizedValues);
+    if (tokenizedValues.length < 2)
+        return [];
     console.log("COUNTED");
     console.log(lodash_1.countBy(tokenizedValues));
     let enrichedInputValues = [];
@@ -157,23 +159,28 @@ async function processInput(input) {
     // console.log(getMostFrequent(enrichedInputValues));
     let returnValues = [];
     // look for matches in glossar
-    for (const word of glossarEnriched) {
+    for (const glossarValue of glossarEnriched) {
         // console.log("- " + word);
-        if (enrichedInputValues.includes(normalize_for_search_1.default(word))) {
-            console.log("-> MATCH");
-            returnValues.push(word);
+        for (const inputValue of enrichedInputValues) {
+            if (inputValue == glossarValue)
+                returnValues.push(inputValue);
         }
+        // if (enrichedInputValues.includes(normalizer(word))) {
+        //   console.log("-> MATCH");
+        //   returnValues.push(word);
+        // }
     }
+    console.log("returnValues before", returnValues);
     // matches with most occurencies
     mostFrequent = modeArray(returnValues);
     console.log("MOSTFREQUENT MODE ARRAY");
     console.log(mostFrequent);
     // most frequent single words in text
-    console.log("ENRICHEDINPUTVALUES MODE ARRAY");
-    console.log(modeArray(enrichedInputValues));
-    if (modeArray(enrichedInputValues)?.length == 1) {
-        return modeArray(enrichedInputValues);
-    }
+    // console.log("ENRICHEDINPUTVALUES MODE ARRAY");
+    // console.log(modeArray(enrichedInputValues));
+    // if (modeArray(enrichedInputValues)?.length == 1) {
+    //   return modeArray(enrichedInputValues)!;
+    // }
     console.log("RETURN VALUES", returnValues);
     let returnArray = [lodash_1.sample(returnValues)];
     return returnArray;
