@@ -22,7 +22,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.taggy = void 0;
+exports.taggy = exports.Taggy = void 0;
 const readline = __importStar(require("readline"));
 const wink_tokenizer_1 = __importDefault(require("wink-tokenizer"));
 const stopwords_iso_1 = __importDefault(require("stopwords-iso")); // object of stopwords for multiple languages
@@ -44,6 +44,36 @@ let mostFrequent = [];
 // OPTIONAL
 // include wink-nlp (lemmatizing)
 // OPTIONAL
+class Taggy {
+    constructor() {
+        this.name = "taggy";
+        console.log("created the taggy object");
+        return;
+    }
+    hello() {
+        console.log("this is taggy");
+        return "this is taggy";
+    }
+    createTagify(inputElement) {
+        this.tagify = new tagify_1.default(inputElement);
+        return this.tagify;
+    }
+    processInput(input) {
+        return processInput(input);
+    }
+    addTags(input) {
+        tagify.addTags(input);
+        return tagify;
+    }
+    deleteTags() {
+        console.log("called deleteTags");
+        tagify.removeTags();
+    }
+    getMostFrequent() {
+        return mostFrequent;
+    }
+}
+exports.Taggy = Taggy;
 exports.taggy = {
     createTagify: (inputElement) => {
         // console.log(inputElement);

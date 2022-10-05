@@ -9,6 +9,7 @@ import fs from "fs";
 import "regenerator-runtime/runtime";
 import Tagify from "@yaireo/tagify";
 import { countBy, sample, orderBy, groupBy } from "lodash";
+import { stringify } from "querystring";
 
 // let glossarData = require("../taggy/data/glossar.json");
 let glossarData = require("../data/glossar.json");
@@ -26,6 +27,38 @@ let mostFrequent: string[] = [];
 // OPTIONAL
 // include wink-nlp (lemmatizing)
 // OPTIONAL
+
+export class Taggy {
+  name: string;
+  tagify!: Tagify;
+  constructor() {
+    this.name = "taggy";
+    console.log("created the taggy object");
+    return;
+  }
+  hello(): string {
+    console.log("this is taggy");
+    return "this is taggy";
+  }
+  createTagify(inputElement: HTMLInputElement) {
+    this.tagify = new Tagify(inputElement);
+    return this.tagify;
+  }
+  processInput(input: string) {
+    return processInput(input);
+  }
+  addTags(input: string) {
+    tagify.addTags(input);
+    return tagify;
+  }
+  deleteTags() {
+    console.log("called deleteTags");
+    tagify.removeTags();
+  }
+  getMostFrequent() {
+    return mostFrequent;
+  }
+}
 
 export const taggy = {
   createTagify: (inputElement: HTMLInputElement) => {
