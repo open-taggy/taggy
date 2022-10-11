@@ -29,34 +29,95 @@ let mostFrequent: string[] = [];
 // OPTIONAL
 
 export class Taggy {
-  name: string;
-  tagify!: Tagify;
-  constructor() {
+  public name: string;
+  public tagify!: Tagify;
+  public useTaggy: boolean = true;
+  public inputField: HTMLElement;
+  public outputField: HTMLElement;
+  public frequencyOutput: HTMLSpanElement;
+  public mostFrequent: string[] = [];
+
+  constructor(
+    inputField: HTMLInputElement,
+    outputField: HTMLInputElement,
+    frequencyOutput: HTMLSpanElement,
+    useTaggy = true
+    // settings = {}
+  ) {
     this.name = "taggy";
+    this.useTaggy = useTaggy;
+    this.inputField = inputField;
+    this.outputField = outputField;
+    if (this.outputField) this.outputField.setAttribute("readOnly", "true");
+    this.frequencyOutput = frequencyOutput;
     console.log("created the taggy object");
     return;
   }
+
   hello(): string {
-    console.log("this is taggy");
     return "this is taggy";
   }
+
+  setInputField(inputField: HTMLInputElement) {
+    this.inputField = inputField;
+    console.log("taggy", "input field set");
+  }
+
+  setOutputField(outputField: HTMLInputElement) {
+    // outputField.setAttribute("value", "");
+    outputField.readOnly = true;
+    outputField.value = "";
+    this.outputField = outputField;
+    console.log("taggy", "output field set");
+    console.log(this.outputField);
+  }
+
+  setFrequencyOutput(frequencyOutput: HTMLSpanElement) {
+    this.frequencyOutput = frequencyOutput;
+  }
+
+  setMostFrequent(input: string[]) {
+    this.mostFrequent = input;
+  }
+
+  getMostFrequent() {
+    console.log("most frequent called", taggy.getMostFrequent());
+    return taggy.getMostFrequent();
+    // return this.mostFrequent;
+  }
+
   createTagify(inputElement: HTMLInputElement) {
     this.tagify = new Tagify(inputElement);
     return this.tagify;
   }
-  processInput(input: string) {
-    return processInput(input);
+
+  async processInput(input: string) {
+    this.outputField.setAttribute("value", "");
+    let processedInput = await processInput(input);
+    this.outputField.setAttribute("value", processedInput[0]);
+    return processedInput;
   }
+
+  async processAndAddTags(input: string, outputField: HTMLOutputElement) {
+    this.outputField.setAttribute("value", "");
+    let processedInput = await processInput(input);
+    this.outputField.setAttribute("value", processedInput[0]);
+    outputField.value = processedInput[0];
+    return outputField;
+  }
+
   addTags(input: string) {
-    tagify.addTags(input);
+    if (this.useTaggy) {
+      tagify.addTags(input);
+    } else {
+      this.outputField.setAttribute("value", input);
+    }
     return tagify;
   }
+
   deleteTags() {
     console.log("called deleteTags");
     tagify.removeTags();
-  }
-  getMostFrequent() {
-    return mostFrequent;
   }
 }
 
@@ -250,15 +311,15 @@ function enrichWithOpenThesaurus(inputArray: string[]) {
   return enrichedArray;
 }
 
-function getMostFrequent(arr: any) {
-  const hashmap = arr.reduce((acc: any, val: any) => {
-    acc[val] = (acc[val] || 0) + 1;
-    return acc;
-  }, {});
-  return Object.keys(hashmap).reduce((a, b) =>
-    hashmap[a] > hashmap[b] ? a : b
-  );
-}
+// function getMostFrequent(arr: any) {
+//   const hashmap = arr.reduce((acc: any, val: any) => {
+//     acc[val] = (acc[val] || 0) + 1;
+//     return acc;
+//   }, {});
+//   return Object.keys(hashmap).reduce((a, b) =>
+//     hashmap[a] > hashmap[b] ? a : b
+//   );
+// }
 
 function modeArray(array: any) {
   if (array.length == 0) return null;
