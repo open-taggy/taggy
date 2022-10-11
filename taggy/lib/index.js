@@ -37,6 +37,8 @@ let glossarData = require("../data/glossar.json");
 //import synonyms from "germansynonyms";
 // import openthesaurus from "openthesaurus";
 const openthesaurus = require("openthesaurus");
+// OPTIONS
+let OPENTHESAURUS_ENABLED = false;
 let finalInput = [];
 let glossarEnriched = [];
 let tagify;
@@ -191,13 +193,15 @@ async function processInput(input) {
         // get baseforms from openthesaurus?
         for await (const word of tokenizedValues) {
             // enrichedInputValues.push(word);
-            console.log("CALLING OPENTHESAURUS API");
-            await openthesaurus.get(word).then((response) => {
-                if (response && response.baseforms) {
-                    console.log(response.baseforms);
-                    enrichedInputValues.push(response.baseforms);
-                }
-            });
+            if (OPENTHESAURUS_ENABLED) {
+                console.log("CALLING OPENTHESAURUS API");
+                await openthesaurus.get(word).then((response) => {
+                    if (response && response.baseforms) {
+                        console.log(response.baseforms);
+                        enrichedInputValues.push(response.baseforms);
+                    }
+                });
+            }
         }
     }
     // flat out arrays
@@ -212,11 +216,21 @@ async function processInput(input) {
     // let glossar = JSON.parse(glossarData.toString());
     // console.log(glossar);
     let glossarTags = [];
+    let combinedWordsReturnSet = [];
     for (const tag of glossarData.tags) {
         for (const word of tag.words) {
             glossarTags.push(word);
+            // check input for "whitespace-words"
+            let inputLowerCase = input.toLowerCase();
+            console.log(word, inputLowerCase.includes(word));
+            if (word.includes(" ")) {
+                if (inputLowerCase.includes(word))
+                    combinedWordsReturnSet.push(word);
+            }
         }
     }
+    console.log("GLOSSARTAGS");
+    console.log(glossarTags);
     // ASYNC AWAIT OR PROMOISE NEEDED
     // let glossarEnriched = enrichWithOpenThesaurus(glossarTags);
     let glossarEnriched = glossarTags;
@@ -255,9 +269,13 @@ async function processInput(input) {
     // if (modeArray(enrichedInputValues)?.length == 1) {
     //   return modeArray(enrichedInputValues)!;
     // }
+    console.log("COMBINEDWORDSRETURNSET", combinedWordsReturnSet);
     console.log("RETURN VALUES", returnValues);
-    let returnArray = [lodash_1.sample(returnValues)];
-    return returnArray;
+    // let returnArray: string[] = combinedWordsReturnSet.concat([
+    //   sample(returnValues)!,
+    // ]);
+    let finalSet = [...combinedWordsReturnSet].concat(returnValues);
+    return [lodash_1.sample(finalSet)];
 }
 function enrichWithOpenThesaurus(inputArray) {
     let enrichedArray = [];

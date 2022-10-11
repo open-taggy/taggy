@@ -19,6 +19,9 @@ let glossarData = require("../data/glossar.json");
 // import openthesaurus from "openthesaurus";
 const openthesaurus = require("openthesaurus");
 
+// OPTIONS
+let OPENTHESAURUS_ENABLED: boolean = false;
+
 let finalInput: string[] = [];
 let glossarEnriched: string[] = [];
 let tagify: Tagify;
@@ -209,14 +212,16 @@ async function processInput(input: string): Promise<string[]> {
     // get baseforms from openthesaurus?
     for await (const word of tokenizedValues) {
       // enrichedInputValues.push(word);
-      console.log("CALLING OPENTHESAURUS API");
 
-      await openthesaurus.get(word).then((response: any) => {
-        if (response && response.baseforms) {
-          console.log(response.baseforms);
-          enrichedInputValues.push(response.baseforms);
-        }
-      });
+      if (OPENTHESAURUS_ENABLED) {
+        console.log("CALLING OPENTHESAURUS API");
+        await openthesaurus.get(word).then((response: any) => {
+          if (response && response.baseforms) {
+            console.log(response.baseforms);
+            enrichedInputValues.push(response.baseforms);
+          }
+        });
+      }
     }
   }
 
@@ -235,12 +240,23 @@ async function processInput(input: string): Promise<string[]> {
   // console.log(glossar);
 
   let glossarTags: string[] = [];
+  let combinedWordsReturnSet: string[] = [];
 
   for (const tag of glossarData.tags) {
     for (const word of tag.words) {
       glossarTags.push(word);
+
+      // check input for "whitespace-words"
+      let inputLowerCase = input.toLowerCase();
+      console.log(word, inputLowerCase.includes(word));
+      if (word.includes(" ")) {
+        if (inputLowerCase.includes(word)) combinedWordsReturnSet.push(word);
+      }
     }
   }
+
+  console.log("GLOSSARTAGS");
+  console.log(glossarTags);
 
   // ASYNC AWAIT OR PROMOISE NEEDED
   // let glossarEnriched = enrichWithOpenThesaurus(glossarTags);
@@ -289,9 +305,16 @@ async function processInput(input: string): Promise<string[]> {
   //   return modeArray(enrichedInputValues)!;
   // }
 
+  console.log("COMBINEDWORDSRETURNSET", combinedWordsReturnSet);
   console.log("RETURN VALUES", returnValues);
-  let returnArray: string[] = [sample(returnValues)!];
-  return returnArray;
+
+  // let returnArray: string[] = combinedWordsReturnSet.concat([
+  //   sample(returnValues)!,
+  // ]);
+
+  let finalSet: string[] = [...combinedWordsReturnSet!].concat(returnValues);
+
+  return [sample(finalSet)!];
 }
 
 function enrichWithOpenThesaurus(inputArray: string[]) {
