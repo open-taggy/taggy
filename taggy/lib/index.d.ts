@@ -18,7 +18,7 @@ export declare class Taggy {
     getMostFrequent(): string[];
     createTagify(inputElement: HTMLInputElement): Tagify<Tagify.TagData>;
     processInput(input: string): Promise<string[]>;
-    processAndAddTags(input: string, outputField: HTMLOutputElement): Promise<HTMLOutputElement>;
+    processAndAddTags(input: string, outputField: HTMLOutputElement): Promise<string[]>;
     addTags(input: string): Tagify<Tagify.TagData>;
     deleteTags(): void;
 }

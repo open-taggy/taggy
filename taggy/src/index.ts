@@ -72,7 +72,6 @@ export class Taggy {
     outputField.value = "";
     this.outputField = outputField;
     console.log("taggy", "output field set");
-    console.log(this.outputField);
   }
 
   setFrequencyOutput(frequencyOutput: HTMLSpanElement) {
@@ -104,9 +103,10 @@ export class Taggy {
   async processAndAddTags(input: string, outputField: HTMLOutputElement) {
     this.outputField.setAttribute("value", "");
     let processedInput = await processInput(input);
+    let mostFrequent = taggy.getMostFrequent();
     this.outputField.setAttribute("value", processedInput[0]);
     outputField.value = processedInput[0];
-    return outputField;
+    return mostFrequent;
   }
 
   addTags(input: string) {
@@ -168,6 +168,7 @@ export const taggy = {
 };
 
 async function processInput(input: string): Promise<string[]> {
+  console.log("called processinput");
   // tokenize input
   const winkTokenizer = new tokenizer();
   const stopwordsDE = stopwords.de;
@@ -242,15 +243,18 @@ async function processInput(input: string): Promise<string[]> {
   let glossarTags: string[] = [];
   let combinedWordsReturnSet: string[] = [];
 
+  let inputLowerCase = input.toLowerCase();
+
   for (const tag of glossarData.tags) {
     for (const word of tag.words) {
       glossarTags.push(word);
 
       // check input for "whitespace-words"
-      let inputLowerCase = input.toLowerCase();
-      console.log(word, inputLowerCase.includes(word));
       if (word.includes(" ")) {
-        if (inputLowerCase.includes(word)) combinedWordsReturnSet.push(word);
+        if (inputLowerCase.includes(word)) {
+          combinedWordsReturnSet.push(word);
+          console.log("whitespace-word match added", word);
+        }
       }
     }
   }
