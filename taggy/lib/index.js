@@ -240,13 +240,6 @@ async function processInput(input) {
     console.log(glossarEnriched);
     console.log("ENRICHEDINPUTVALUES");
     console.log(enrichedInputValues);
-    // console.log("ENRICHEDINPUTVALUES SORTED");
-    // console.log(enrichedInputValues.sort());
-    // console.log("ENRICHEDINPUTVALUES COUNTBY");
-    // console.log(countBy(enrichedInputValues));
-    // console.log(groupBy(countBy(enrichedInputValues)));
-    // console.log("ENRICHEDINPUTVALUES MOSTFREQUENT");
-    // console.log(getMostFrequent(enrichedInputValues));
     let returnValues = [];
     // look for matches in glossar
     for (const glossarValue of glossarEnriched) {
@@ -261,10 +254,6 @@ async function processInput(input) {
         // }
     }
     console.log("returnValues before", returnValues);
-    // matches with most occurencies
-    mostFrequent = modeArray(returnValues);
-    console.log("MOSTFREQUENT MODE ARRAY");
-    console.log(mostFrequent);
     // most frequent single words in text
     // console.log("ENRICHEDINPUTVALUES MODE ARRAY");
     // console.log(modeArray(enrichedInputValues));
@@ -277,7 +266,13 @@ async function processInput(input) {
     //   sample(returnValues)!,
     // ]);
     let finalSet = [...combinedWordsReturnSet].concat(returnValues);
-    return [lodash_1.sample(finalSet)];
+    console.log("FINAL SET", finalSet);
+    console.log(finalSet);
+    // matches with most occurencies
+    mostFrequent = modeArray(finalSet);
+    console.log("MOSTFREQUENT MODE ARRAY");
+    console.log(mostFrequent);
+    return [lodash_1.sample(mostFrequent)];
 }
 function enrichWithOpenThesaurus(inputArray) {
     let enrichedArray = [];
