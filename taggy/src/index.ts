@@ -3,20 +3,24 @@ import tokenizer from "wink-tokenizer";
 import stopwords from "stopwords-iso"; // object of stopwords for multiple languages
 // import stopwordsDE from de; // german stopwords
 import normalizer from "normalize-for-search";
-import jargon from "@clipperhouse/jargon";
-import stackexchange from "@clipperhouse/jargon/stackexchange"; // a dictionary
-import fs from "fs";
+// import jargon from "@clipperhouse/jargon";
+// import stackexchange from "@clipperhouse/jargon/stackexchange"; // a dictionary
+// import fs from "fs";
 import "regenerator-runtime/runtime";
 import Tagify from "@yaireo/tagify";
-import { countBy, sample, orderBy, groupBy } from "lodash";
-import { stringify } from "querystring";
+import { sample } from "lodash";
+// import { stringify } from "querystring";
+// import { match } from "assert";
 
 // let glossarData = require("../taggy/data/glossar.json");
 let glossarData = require("../data/glossar.json");
 // import * as glossarData from "../taggy/data/glossar.json";
 
+// OPTIONAL
+// include wink-nlp (lemmatizing)
+// OPTIONAL
+
 //import synonyms from "germansynonyms";
-// import openthesaurus from "openthesaurus";
 const openthesaurus = require("openthesaurus");
 
 // OPTIONS
@@ -26,10 +30,6 @@ let finalInput: string[] = [];
 let glossarEnriched: string[] = [];
 let tagify: Tagify;
 let mostFrequent: string[] = [];
-
-// OPTIONAL
-// include wink-nlp (lemmatizing)
-// OPTIONAL
 
 export class Taggy {
   public name: string;
@@ -96,17 +96,19 @@ export class Taggy {
   async processInput(input: string) {
     this.outputField.setAttribute("value", "");
     let processedInput = await processInput(input);
+    console.log("processedinput", processedInput[0]);
+    processedInput[0] = processedInput[0] ? processedInput[0] : "";
     this.outputField.setAttribute("value", processedInput[0]);
     return processedInput;
   }
 
   async processAndAddTags(input: string, outputField: HTMLOutputElement) {
     this.outputField.setAttribute("value", "");
-    let processedInput = await processInput(input);
-    let mostFrequent = taggy.getMostFrequent();
+    let processedInput = await this.processInput(input);
+    // let mostFrequent = taggy.getMostFrequent();
     this.outputField.setAttribute("value", processedInput[0]);
     outputField.value = processedInput[0];
-    return mostFrequent;
+    return processedInput[0];
   }
 
   addTags(input: string) {
@@ -169,6 +171,7 @@ export const taggy = {
 
 async function processInput(input: string): Promise<string[]> {
   console.log("called processinput");
+
   // tokenize input
   const winkTokenizer = new tokenizer();
   const stopwordsDE = stopwords.de;
@@ -177,16 +180,13 @@ async function processInput(input: string): Promise<string[]> {
   let tokenizedWords = tokenizedItems.filter((item) => {
     return item.tag === "word";
   });
-  // console.log(tokenizedItems);
-  // console.log(tokenizedWords);
-  // console.log(stopwordsDE);
 
   // filter out german stopwords
   let tokenizedWordsNoStop = tokenizedWords.filter(
     (item) => !stopwordsDE.includes(item.value)
   );
 
-  // create array with only lowercase and normalized (remove ö and stuff)
+  // normalize input (remove umlaute and transform to lowercase)
   let tokenizedValues = [];
   for (const element of tokenizedWordsNoStop) {
     tokenizedValues.push(normalizer(element.value));
@@ -197,32 +197,28 @@ async function processInput(input: string): Promise<string[]> {
     // optional lemmatizer for tech words?
   }
 
-  console.log("Tokenized Values");
+  console.log("tokenized and normalized values");
   console.log(tokenizedValues);
 
+  // return if input is too small
   if (tokenizedValues.length < 2) return [];
-
-  console.log("COUNTED");
-  console.log(countBy(tokenizedValues));
 
   let enrichedInputValues: string[] = [];
   mostFrequent = [];
 
   // don't call openthesaurus-API too often (-> results in too many requests error)
-  if (tokenizedValues.length < 20) {
+  if (OPENTHESAURUS_ENABLED && tokenizedValues.length < 20) {
     // get baseforms from openthesaurus?
     for await (const word of tokenizedValues) {
       // enrichedInputValues.push(word);
 
-      if (OPENTHESAURUS_ENABLED) {
-        console.log("CALLING OPENTHESAURUS API");
-        await openthesaurus.get(word).then((response: any) => {
-          if (response && response.baseforms) {
-            console.log(response.baseforms);
-            enrichedInputValues.push(response.baseforms);
-          }
-        });
-      }
+      console.log("CALLING OPENTHESAURUS API");
+      await openthesaurus.get(word).then((response: any) => {
+        if (response && response.baseforms) {
+          console.log(response.baseforms);
+          enrichedInputValues.push(response.baseforms);
+        }
+      });
     }
   }
 
@@ -231,45 +227,44 @@ async function processInput(input: string): Promise<string[]> {
     .flat()
     .concat(tokenizedValues.flat());
 
-  // get baseforms from openthesaurus?
-
-  // read glossar data
-  // let rawData = fs.readFileSync("../taggy/data/glossar.json");
-  // console.log(process.cwd());
-  // console.log(glossarData);
-  // let glossar = JSON.parse(glossarData.toString());
-  // console.log(glossar);
+  console.log("NORMALIZED/ENRICHED INPUTVALUES");
+  console.log(enrichedInputValues);
 
   let glossarTags: string[] = [];
   let combinedWordsReturnSet: string[] = [];
 
-  let inputLowerCase = input.toLowerCase();
+  let inputLowerCase = normalizer(input);
 
   for (const tag of glossarData.tags) {
     for (const word of tag.words) {
-      glossarTags.push(word);
+      // normalize input
+      glossarTags.push(normalizer(word));
 
       // check input for "whitespace-words"
       if (word.includes(" ")) {
         if (inputLowerCase.includes(word)) {
-          combinedWordsReturnSet.push(word);
-          console.log("whitespace-word match added", word);
+          let matchArray = inputLowerCase.matchAll(word);
+          for (let match of matchArray) {
+            combinedWordsReturnSet.push(match[0]);
+            console.log(match[0]);
+            console.log("whitespace-word match added", match[0]);
+          }
         }
       }
     }
   }
 
-  console.log("GLOSSARTAGS");
+  console.log("WORDS IN GLOSSAR");
   console.log(glossarTags);
 
   // ASYNC AWAIT OR PROMOISE NEEDED
   // let glossarEnriched = enrichWithOpenThesaurus(glossarTags);
   let glossarEnriched = glossarTags;
 
-  console.log("GLOSSARENRICHED");
-  console.log(glossarEnriched);
+  // console.log("GLOSSARENRICHED");
+  // console.log(glossarEnriched);
 
-  console.log("ENRICHEDINPUTVALUES");
+  console.log("ENRICHED INPUTVALUES");
   console.log(enrichedInputValues);
 
   let returnValues: string[] = [];
@@ -286,16 +281,6 @@ async function processInput(input: string): Promise<string[]> {
     //   returnValues.push(word);
     // }
   }
-
-  console.log("returnValues before", returnValues);
-
-  // most frequent single words in text
-  // console.log("ENRICHEDINPUTVALUES MODE ARRAY");
-  // console.log(modeArray(enrichedInputValues));
-
-  // if (modeArray(enrichedInputValues)?.length == 1) {
-  //   return modeArray(enrichedInputValues)!;
-  // }
 
   console.log("COMBINEDWORDSRETURNSET", combinedWordsReturnSet);
   console.log("RETURN VALUES", returnValues);
@@ -334,15 +319,6 @@ function enrichWithOpenThesaurus(inputArray: string[]) {
   return enrichedArray;
 }
 
-// function getMostFrequent(arr: any) {
-//   const hashmap = arr.reduce((acc: any, val: any) => {
-//     acc[val] = (acc[val] || 0) + 1;
-//     return acc;
-//   }, {});
-//   return Object.keys(hashmap).reduce((a, b) =>
-//     hashmap[a] > hashmap[b] ? a : b
-//   );
-// }
 
 function modeArray(array: any) {
   if (array.length == 0) return null;
