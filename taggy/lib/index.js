@@ -38,6 +38,7 @@ const lodash_1 = require("lodash");
 // import { match } from "assert";
 // let glossarData = require("../taggy/data/glossar.json");
 let glossarData = require("../data/glossar.json");
+let config = require("../data/config.json");
 // import * as glossarData from "../taggy/data/glossar.json";
 // OPTIONAL
 // include wink-nlp (lemmatizing)
@@ -46,14 +47,17 @@ let glossarData = require("../data/glossar.json");
 const openthesaurus = require("openthesaurus");
 // OPTIONS
 let OPENTHESAURUS_ENABLED = false;
-let finalInput = [];
-let glossarEnriched = [];
+let ASSIGN_TOP = true;
+OPENTHESAURUS_ENABLED = config.openthesaurus === "true";
+console.log("GLOBAL OP", OPENTHESAURUS_ENABLED);
+ASSIGN_TOP = config.categories["assign-top"] === "true";
+console.log("GLOBAL AT", ASSIGN_TOP);
 let tagify;
 let mostFrequent = [];
 class Taggy {
-    constructor(inputField, outputField, frequencyOutput, useTaggy = true
+    constructor(inputField, outputField, frequencyOutput, useTaggy = true, 
     // settings = {}
-    ) {
+    OPENTHESAURUS_ENABLED = config.openthesaurus === true, ASSIGN_TOP = config.categories["assign-top"] === true) {
         this.useTaggy = true;
         this.mostFrequent = [];
         this.name = "taggy";
@@ -64,6 +68,8 @@ class Taggy {
             this.outputField.setAttribute("readOnly", "true");
         this.frequencyOutput = frequencyOutput;
         console.log("created the taggy object");
+        console.log("OP", OPENTHESAURUS_ENABLED);
+        console.log("AT", ASSIGN_TOP);
         return;
     }
     hello() {
@@ -109,11 +115,17 @@ class Taggy {
         // let mostFrequent = taggy.getMostFrequent();
         this.outputField.setAttribute("value", processedInput[0]);
         outputField.value = processedInput[0];
+        // TODO -> modularize
+        if (this.useTaggy) {
+            tagify = this.createTagify(outputField);
+            tagify.removeAllTags();
+            tagify.addTags(processedInput[0]);
+        }
         return processedInput[0];
     }
     addTags(input) {
         if (this.useTaggy) {
-            tagify.addTags(input);
+            this.tagify.addTags(input);
         }
         else {
             this.outputField.setAttribute("value", input);
@@ -265,7 +277,28 @@ async function processInput(input) {
     mostFrequent = modeArray(finalSet);
     console.log("MOSTFREQUENT MODE ARRAY");
     console.log(mostFrequent);
-    return [lodash_1.sample(mostFrequent)];
+    let finalValue = lodash_1.sample(mostFrequent);
+    console.log("FINALVALUE", finalValue);
+    console.log(glossarData.tags);
+    let searchGlossar = glossarData.tags;
+    let finalReturnValue = "";
+    // if ASSIGN_TOP is set -> return top categegory
+    if (ASSIGN_TOP) {
+        searchGlossar.forEach((category) => {
+            console.log(category);
+            category.words.forEach((word) => {
+                if (normalize_for_search_1.default(word) == finalValue) {
+                    console.log("MATCH FOR", category.name);
+                    finalReturnValue = category.name;
+                }
+            });
+        });
+        return [finalReturnValue];
+    }
+    else {
+        return [finalValue];
+    }
+    // console.log(returnValue);
 }
 function enrichWithOpenThesaurus(inputArray) {
     let enrichedArray = [];

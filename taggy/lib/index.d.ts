@@ -9,7 +9,7 @@ export declare class Taggy {
     outputField: HTMLElement;
     frequencyOutput: HTMLSpanElement;
     mostFrequent: string[];
-    constructor(inputField: HTMLInputElement, outputField: HTMLInputElement, frequencyOutput: HTMLSpanElement, useTaggy?: boolean);
+    constructor(inputField: HTMLInputElement, outputField: HTMLInputElement, frequencyOutput: HTMLSpanElement, useTaggy?: boolean, OPENTHESAURUS_ENABLED?: boolean, ASSIGN_TOP?: boolean);
     hello(): string;
     setInputField(inputField: HTMLInputElement): void;
     setOutputField(outputField: HTMLInputElement): void;
@@ -18,7 +18,7 @@ export declare class Taggy {
     getMostFrequent(): string[];
     createTagify(inputElement: HTMLInputElement): Tagify<Tagify.TagData>;
     processInput(input: string): Promise<string[]>;
-    processAndAddTags(input: string, outputField: HTMLOutputElement): Promise<string>;
+    processAndAddTags(input: string, outputField: HTMLInputElement): Promise<string>;
     addTags(input: string): Tagify<Tagify.TagData>;
     deleteTags(): void;
 }

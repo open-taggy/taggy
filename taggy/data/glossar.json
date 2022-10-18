@@ -1,19 +1,19 @@
 {
   "tags": [
     {
-      "name": "mountainbike",
+      "name": "Mountainbike",
       "words": ["berge", "felsen", "fully", "mtb"]
     },
     {
-      "name": "rennrad",
+      "name": "Rennrad",
       "words": ["straße", "dura ace", "tour de france"]
     },
     {
-      "name": "trekking/reise",
+      "name": "Trekking/Reise",
       "words": ["trekking", "reise", "langstrecke", "gepäcktasche"]
     },
     {
-      "name": "urban",
+      "name": "Urban",
       "words": ["pendeln", "fixed gear", "pegs"]
     }
   ]
