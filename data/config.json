@@ -1,0 +1,10 @@
+{
+  "openthesaurus": "false",
+  "use-tagify": "true",
+  "categories": {
+    "assign-top": "true",
+    "assign-top_comment": "return top tag (category) if subtag is found. Return subtag else.",
+    "include-top": "false",
+    "include-top_comment": "include top tag (category) as a keyword"
+  }
+}
