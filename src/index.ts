@@ -14,9 +14,17 @@ import Tagify from "@yaireo/tagify";
 // include wink-nlp (lemmatizing)
 import openthesaurus from "openthesaurus";
 const glossarData = require("../data/glossar.json");
-const config = require("../data/config.json");
+const configFile = require("../data/config.json");
+
+let configDefinition: {
+  use_tagify: boolean;
+  opt_enabled: boolean;
+  assign_top: boolean;
+  include_top: boolean;
+};
 
 export class Taggy {
+  public name: string = "taggy";
   private tagify!: Tagify;
   private winkTokenizer: tokenizer;
   private stopwordsDE: any;
@@ -25,10 +33,14 @@ export class Taggy {
   private outputField: HTMLElement;
   private frequencyOutput: HTMLSpanElement;
   private mostFrequent: string[] = [];
-  private USE_TAGIFY: boolean = config["use-tagify"] === "true";
-  private OPENTHESAURUS_ENABLED: boolean = config["openthesaurus"] === "true";
-  private ASSIGN_TOP: boolean = config.categories["assign-top"] === "true";
-  private INCLUDE_TOP: boolean = config.categories["include-top"] === "true";
+
+  public config = configDefinition;
+  private USE_TAGIFY: boolean = configFile["use-tagify"] === "true";
+  private OPENTHESAURUS_ENABLED: boolean =
+    configFile["openthesaurus"] === "true";
+  private ASSIGN_TOP: boolean = configFile.categories["assign-top"] === "true";
+  private INCLUDE_TOP: boolean =
+    configFile.categories["include-top"] === "true";
 
   /**
    * Create a new instance of taggy
@@ -41,8 +53,17 @@ export class Taggy {
     inputField: HTMLInputElement,
     outputField: HTMLInputElement,
     frequencyOutput: HTMLSpanElement,
-    useTagify: boolean = config.categories["assign-top"] === "true"
+    useTagify: boolean = configFile.categories["assign-top"] === "true"
   ) {
+    // config (again) -> TODO: SANITIZE CONFIG STUFF (ABOVE)
+    this.config = {
+      use_tagify: this.USE_TAGIFY,
+      opt_enabled: this.OPENTHESAURUS_ENABLED,
+      assign_top: this.ASSIGN_TOP,
+      include_top: this.INCLUDE_TOP,
+    };
+    console.log("TAGGY CONFIG", this.config);
+
     this.inputField = inputField;
     this.outputField = outputField;
     this.USE_TAGIFY = useTagify;
@@ -50,6 +71,7 @@ export class Taggy {
     this.stopwordsDE = stopwords.de;
     if (this.outputField) this.outputField.setAttribute("readOnly", "true");
     this.frequencyOutput = frequencyOutput;
+
     console.log("created the taggy object");
     console.log("OP", this.OPENTHESAURUS_ENABLED);
     console.log("USE_TAGIFY", this.USE_TAGIFY);
@@ -76,6 +98,10 @@ export class Taggy {
 
   setMostFrequent(input: string[]) {
     this.mostFrequent = input;
+  }
+
+  getConfig() {
+    return this.config;
   }
 
   getMostFrequent() {

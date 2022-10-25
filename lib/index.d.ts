@@ -2,6 +2,7 @@
 import "regenerator-runtime/runtime";
 import Tagify from "@yaireo/tagify";
 export declare class Taggy {
+    name: string;
     private tagify;
     private winkTokenizer;
     private stopwordsDE;
@@ -9,6 +10,12 @@ export declare class Taggy {
     private outputField;
     private frequencyOutput;
     private mostFrequent;
+    config: {
+        use_tagify: boolean;
+        opt_enabled: boolean;
+        assign_top: boolean;
+        include_top: boolean;
+    };
     private USE_TAGIFY;
     private OPENTHESAURUS_ENABLED;
     private ASSIGN_TOP;
@@ -25,6 +32,12 @@ export declare class Taggy {
     setOutputField(outputField: HTMLInputElement): void;
     setFrequencyOutput(frequencyOutput: HTMLSpanElement): void;
     setMostFrequent(input: string[]): void;
+    getConfig(): {
+        use_tagify: boolean;
+        opt_enabled: boolean;
+        assign_top: boolean;
+        include_top: boolean;
+    };
     getMostFrequent(): string[];
     createTagify(inputElement: HTMLInputElement): Tagify<Tagify.TagData>;
     process(input: string): Promise<string[]>;
