@@ -12,7 +12,7 @@ import Tagify from "@yaireo/tagify";
 // import stackexchange from "@clipperhouse/jargon/stackexchange"; // a dictionary
 // import fs from "fs";
 // include wink-nlp (lemmatizing)
-import openthesaurus from "openthesaurus";
+const openthesaurus = require("openthesaurus");
 const glossarData = require("../data/glossar.json");
 const configFile = require("../data/config.json");
 
@@ -20,7 +20,9 @@ let configDefinition: {
   use_tagify: boolean;
   opt_enabled: boolean;
   assign_top: boolean;
+  assign_top_comment: string;
   include_top: boolean;
+  include_top_comment: string;
 };
 
 export class Taggy {
@@ -28,6 +30,7 @@ export class Taggy {
   private tagify!: Tagify;
   private winkTokenizer: tokenizer;
   private stopwordsDE: any;
+  private openthesaurus: any;
 
   private inputField: HTMLElement;
   private outputField: HTMLElement;
@@ -47,32 +50,36 @@ export class Taggy {
    * @param inputField Input field where user text goes
    * @param outputField Output field where the tags will show up
    * @param frequencyOutput Show frequency of identified tags
-   * @param useTagify Optional: Use tagify dependency? Default: true
+   * @param options Optional: Provide options for taggys behaviour
    */
   constructor(
     inputField: HTMLInputElement,
     outputField: HTMLInputElement,
     frequencyOutput: HTMLSpanElement,
-    useTagify: boolean = configFile.categories["assign-top"] === "true"
+    options: Object
   ) {
     // config (again) -> TODO: SANITIZE CONFIG STUFF (ABOVE)
     this.config = {
       use_tagify: this.USE_TAGIFY,
       opt_enabled: this.OPENTHESAURUS_ENABLED,
       assign_top: this.ASSIGN_TOP,
+      assign_top_comment: configFile.categories["assign-top-comment"],
       include_top: this.INCLUDE_TOP,
+      include_top_comment: configFile.categories["include-top-comment"],
     };
     console.log("TAGGY CONFIG", this.config);
 
     this.inputField = inputField;
     this.outputField = outputField;
-    this.USE_TAGIFY = useTagify;
+
     this.winkTokenizer = new tokenizer();
     this.stopwordsDE = stopwords.de;
+    this.openthesaurus = openthesaurus;
+
     if (this.outputField) this.outputField.setAttribute("readOnly", "true");
     this.frequencyOutput = frequencyOutput;
 
-    console.log("created the taggy object");
+    console.log("created a new taggy instance");
     console.log("OP", this.OPENTHESAURUS_ENABLED);
     console.log("USE_TAGIFY", this.USE_TAGIFY);
     console.log("ASSIGN-TOP", this.ASSIGN_TOP);
@@ -104,6 +111,22 @@ export class Taggy {
     return this.config;
   }
 
+  setOption(option: string, value: boolean) {
+    console.log("setting", option, "to", value);
+    if (option == "use_tagify") {
+      this.config.use_tagify = value;
+    }
+    if (option == "assign_top") {
+      this.config.assign_top = value;
+    }
+    if (option == "opt_enabled") {
+      this.config.opt_enabled = value;
+    }
+    if (option == "include_top") {
+      this.config.include_top = value;
+    }
+  }
+
   getMostFrequent() {
     console.log("most frequent called", this.mostFrequent);
     return this.mostFrequent;
@@ -125,13 +148,19 @@ export class Taggy {
 
   async processAndAddTags(input: string, outputField: HTMLInputElement) {
     this.outputField.setAttribute("value", "");
+    if (this.tagify) {
+      console.log("before destroy", this.tagify);
+      this.tagify.destroy();
+      console.log("after destroy", this.tagify);
+    }
+
     let processedInput = await this.processInput(input);
     // let mostFrequent = taggy.getMostFrequent();
     this.outputField.setAttribute("value", processedInput[0]);
     outputField.value = processedInput[0];
 
     // TODO -> modularize
-    if (this.USE_TAGIFY) {
+    if (this.config.use_tagify) {
       this.tagify = this.createTagify(outputField);
       this.tagify.removeAllTags();
       this.tagify.addTags(processedInput[0]);
@@ -140,7 +169,7 @@ export class Taggy {
   }
 
   addTags(input: string) {
-    if (this.USE_TAGIFY) {
+    if (this.config.use_tagify) {
       this.tagify.addTags(input);
     } else {
       this.outputField.setAttribute("value", input);
@@ -187,13 +216,13 @@ export class Taggy {
     this.mostFrequent = [];
 
     // don't call openthesaurus-API too often (-> results in too many requests error)
-    if (this.OPENTHESAURUS_ENABLED && tokenizedValues.length < 20) {
+    if (this.config.opt_enabled && tokenizedValues.length < 20) {
       // get baseforms from openthesaurus?
       for await (const word of tokenizedValues) {
         // enrichedInputValues.push(word);
 
         console.log("CALLING OPENTHESAURUS API");
-        await openthesaurus.get(word).then((response: any) => {
+        await this.openthesaurus.get(word).then((response: any) => {
           if (response && response.baseforms) {
             console.log(response.baseforms);
             enrichedInputValues.push(response.baseforms);
@@ -215,8 +244,14 @@ export class Taggy {
 
     let inputLowerCase = normalizer(input);
 
-    for (const tag of glossarData.tags) {
-      for (const word of tag.words) {
+    for (const category of glossarData.tags) {
+      // if INCLUDE-TOP is set -> add top tag
+      if (this.config.include_top) {
+        console.log(category);
+        glossarTags.push(normalizer(category.name));
+      }
+
+      for (const word of category.words) {
         // normalize input
         glossarTags.push(normalizer(word));
 
@@ -285,23 +320,19 @@ export class Taggy {
     console.log(glossarData.tags);
     let searchGlossar = glossarData.tags;
 
-    let finalReturnValue = "";
-
     // if ASSIGN_TOP is set -> return top categegory
-    if (this.ASSIGN_TOP) {
+    if (this.config.assign_top) {
       searchGlossar.forEach((category: any) => {
         console.log(category);
         category.words.forEach((word: string) => {
           if (normalizer(word) == finalValue) {
             console.log("MATCH FOR", category.name);
-            finalReturnValue = category.name;
+            finalValue = category.name;
           }
         });
       });
-      return [finalReturnValue];
-    } else {
-      return [finalValue];
     }
+    return finalValue ? [finalValue] : [""];
 
     // console.log(returnValue);
   }

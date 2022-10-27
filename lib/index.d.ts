@@ -6,6 +6,7 @@ export declare class Taggy {
     private tagify;
     private winkTokenizer;
     private stopwordsDE;
+    private openthesaurus;
     private inputField;
     private outputField;
     private frequencyOutput;
@@ -14,7 +15,9 @@ export declare class Taggy {
         use_tagify: boolean;
         opt_enabled: boolean;
         assign_top: boolean;
+        assign_top_comment: string;
         include_top: boolean;
+        include_top_comment: string;
     };
     private USE_TAGIFY;
     private OPENTHESAURUS_ENABLED;
@@ -25,9 +28,9 @@ export declare class Taggy {
      * @param inputField Input field where user text goes
      * @param outputField Output field where the tags will show up
      * @param frequencyOutput Show frequency of identified tags
-     * @param useTagify Optional: Use tagify dependency? Default: true
+     * @param options Optional: Provide options for taggys behaviour
      */
-    constructor(inputField: HTMLInputElement, outputField: HTMLInputElement, frequencyOutput: HTMLSpanElement, useTagify?: boolean);
+    constructor(inputField: HTMLInputElement, outputField: HTMLInputElement, frequencyOutput: HTMLSpanElement, options: Object);
     setInputField(inputField: HTMLInputElement): void;
     setOutputField(outputField: HTMLInputElement): void;
     setFrequencyOutput(frequencyOutput: HTMLSpanElement): void;
@@ -36,8 +39,11 @@ export declare class Taggy {
         use_tagify: boolean;
         opt_enabled: boolean;
         assign_top: boolean;
+        assign_top_comment: string;
         include_top: boolean;
+        include_top_comment: string;
     };
+    setOption(option: string, value: boolean): void;
     getMostFrequent(): string[];
     createTagify(inputElement: HTMLInputElement): Tagify<Tagify.TagData>;
     process(input: string): Promise<string[]>;
