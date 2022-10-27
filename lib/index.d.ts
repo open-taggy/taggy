@@ -50,5 +50,6 @@ export declare class Taggy {
     processAndAddTags(input: string, outputField: HTMLInputElement): Promise<string>;
     addTags(input: string): Tagify<Tagify.TagData>;
     deleteTags(): void;
+    tokenize(input: string, type?: string): any[];
     processInput(input: string): Promise<string[]>;
 }

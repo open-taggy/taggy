@@ -182,13 +182,18 @@ export class Taggy {
     this.tagify.removeTags();
   }
 
+  tokenize(input: string, type: string = "word"): any[] {
+    let tokenizedItems = this.winkTokenizer.tokenize(input);
+    let tokenizedWords = tokenizedItems.filter((item) => {
+      return item.tag === type;
+    });
+    return tokenizedWords;
+  }
+
   async processInput(input: string): Promise<string[]> {
     console.log("called processinput");
 
-    let tokenizedItems = this.winkTokenizer.tokenize(input);
-    let tokenizedWords = tokenizedItems.filter((item) => {
-      return item.tag === "word";
-    });
+    let tokenizedWords = this.tokenize(input, "word");
 
     // filter out german stopwords
     let tokenizedWordsNoStop = tokenizedWords.filter(
@@ -223,10 +228,34 @@ export class Taggy {
 
         console.log("CALLING OPENTHESAURUS API");
         await this.openthesaurus.get(word).then((response: any) => {
-          if (response && response.baseforms) {
-            console.log(response.baseforms);
-            enrichedInputValues.push(response.baseforms);
+          console.log(response);
+          let optValues: string[] = [];
+          // response.baseforms?
+          if (response && response.synsets[0].terms) {
+            console.log(response.synsets[0].terms);
+
+            response.synsets[0].terms.forEach((term: any) => {
+              optValues.push(normalizer(term.term));
+            });
           }
+
+          console.log("PRE FILTER", optValues);
+          // filter out german stopwords
+          let optValuesNoStop = optValues.filter(
+            (item) => !this.stopwordsDE.includes(item)
+          );
+          console.log("AFTER FILTER", optValuesNoStop);
+
+          let optValuesTokenized = this.tokenize(
+            optValuesNoStop.toString(),
+            "word"
+          );
+
+          optValuesTokenized.forEach((element) => {
+            enrichedInputValues.push(element.word);
+          });
+
+          console.log("LOOT", enrichedInputValues);
         });
       }
     }
