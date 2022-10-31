@@ -1,4 +1,4 @@
-# taggy base package 🐓
+# taggy | base package 🐓
 The main package for taggy.
 
 ## Getting Started
