@@ -11,9 +11,12 @@ export declare class Taggy {
     private outputField;
     private frequencyOutput;
     private mostFrequent;
+    private timeout;
     config: {
         use_tagify: boolean;
         use_tagify_comment: string;
+        waittime: number;
+        waittime_comment: string;
         opt_enabled: boolean;
         opt_enabled_comment: string;
         assign_top: boolean;
@@ -34,19 +37,11 @@ export declare class Taggy {
      */
     constructor(inputField: HTMLInputElement, outputField: HTMLInputElement, frequencyOutput: HTMLSpanElement, options: Object);
     setInputField(inputField: HTMLInputElement): void;
+    handleEventListener(): void;
     setOutputField(outputField: HTMLInputElement): void;
     setFrequencyOutput(frequencyOutput: HTMLSpanElement): void;
     setMostFrequent(input: string[]): void;
-    getConfig(): {
-        use_tagify: boolean;
-        use_tagify_comment: string;
-        opt_enabled: boolean;
-        opt_enabled_comment: string;
-        assign_top: boolean;
-        assign_top_comment: string;
-        include_top: boolean;
-        include_top_comment: string;
-    };
+    getConfig(): Object;
     getGlossar(): JSON;
     setOption(option: string, value: boolean): void;
     getMostFrequent(): string[];

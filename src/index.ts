@@ -19,6 +19,8 @@ const configFile = require("../data/config.json");
 let configDefinition: {
   use_tagify: boolean;
   use_tagify_comment: string;
+  waittime: number;
+  waittime_comment: string;
   opt_enabled: boolean;
   opt_enabled_comment: string;
   assign_top: boolean;
@@ -34,10 +36,11 @@ export class Taggy {
   private stopwordsDE: any;
   private openthesaurus: any;
 
-  private inputField: HTMLElement;
-  private outputField: HTMLElement;
+  private inputField!: HTMLInputElement;
+  private outputField: HTMLInputElement;
   private frequencyOutput: HTMLSpanElement;
   private mostFrequent: string[] = [];
+  private timeout: any = null;
 
   public config = configDefinition;
   private USE_TAGIFY: boolean = configFile["use-tagify"] === "true";
@@ -64,6 +67,8 @@ export class Taggy {
     this.config = {
       use_tagify: this.USE_TAGIFY,
       use_tagify_comment: configFile["use-tagify-comment"],
+      waittime: configFile["waittime"],
+      waittime_comment: configFile["waittime-comment"],
       opt_enabled: this.OPENTHESAURUS_ENABLED,
       opt_enabled_comment: configFile["openthesaurus-comment"],
       assign_top: this.ASSIGN_TOP,
@@ -73,7 +78,7 @@ export class Taggy {
     };
     console.log("TAGGY CONFIG", this.config);
 
-    this.inputField = inputField;
+    this.setInputField(inputField);
     this.outputField = outputField;
 
     this.winkTokenizer = new tokenizer();
@@ -84,15 +89,34 @@ export class Taggy {
     this.frequencyOutput = frequencyOutput;
 
     console.log("created a new taggy instance");
-    console.log("OP", this.OPENTHESAURUS_ENABLED);
-    console.log("USE_TAGIFY", this.USE_TAGIFY);
-    console.log("ASSIGN-TOP", this.ASSIGN_TOP);
-    console.log("INCLUDE-TOP", this.INCLUDE_TOP);
   }
 
   setInputField(inputField: HTMLInputElement) {
     this.inputField = inputField;
-    console.log("taggy", "input field set");
+    this.inputField.addEventListener("input", (event) => {
+      this.handleEventListener();
+    });
+    console.log("taggy", "input field and handler set", this.inputField);
+  }
+
+  handleEventListener() {
+    console.log("INSIDE EVENT LISTENER");
+    console.log("WAITTIME", this.config.waittime);
+    this.outputField.style.backgroundColor = "#f2f102";
+    clearTimeout(this.timeout);
+
+    // make a new timeout set to go off in 1000ms
+    this.timeout = setTimeout(async () => {
+      // loader.style.display = "block";
+
+      let result = await this.processAndAddTags(
+        this.inputField.value,
+        this.outputField
+      );
+
+      this.outputField.style.backgroundColor = "#00000";
+      this.addTags(result);
+    }, this.config.waittime);
   }
 
   setOutputField(outputField: HTMLInputElement) {
@@ -111,7 +135,7 @@ export class Taggy {
     this.mostFrequent = input;
   }
 
-  getConfig() {
+  getConfig(): Object {
     return this.config;
   }
 

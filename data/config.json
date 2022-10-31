@@ -3,6 +3,8 @@
   "use-tagify-comment": "default true | Use Tagify to display tags",
   "openthesaurus": "false",
   "openthesaurus-comment": "default false | Add call to openthesaurus API to enrich words (experimental)",
+  "waittime": 1000,
+  "waittime-comment": "default 1000 | Set time to wait for processing after keyboard input",
   "categories": {
     "assign-top": "true",
     "assign-top-comment": "default true | Return top tag (category) if keyword is found. Return the keyword else.",
