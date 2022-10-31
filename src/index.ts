@@ -18,7 +18,9 @@ const configFile = require("../data/config.json");
 
 let configDefinition: {
   use_tagify: boolean;
+  use_tagify_comment: string;
   opt_enabled: boolean;
+  opt_enabled_comment: string;
   assign_top: boolean;
   assign_top_comment: string;
   include_top: boolean;
@@ -61,7 +63,9 @@ export class Taggy {
     // config (again) -> TODO: SANITIZE CONFIG STUFF (ABOVE)
     this.config = {
       use_tagify: this.USE_TAGIFY,
+      use_tagify_comment: configFile["use-tagify-comment"],
       opt_enabled: this.OPENTHESAURUS_ENABLED,
+      opt_enabled_comment: configFile["openthesaurus-comment"],
       assign_top: this.ASSIGN_TOP,
       assign_top_comment: configFile.categories["assign-top-comment"],
       include_top: this.INCLUDE_TOP,
@@ -109,6 +113,10 @@ export class Taggy {
 
   getConfig() {
     return this.config;
+  }
+
+  getGlossar(): JSON {
+    return glossarData;
   }
 
   setOption(option: string, value: boolean) {

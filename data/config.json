@@ -1,8 +1,8 @@
 {
-  "use-tagify": "false",
-  "use-tagify-comment": "default false | Use Tagify to display tags",
+  "use-tagify": "true",
+  "use-tagify-comment": "default true | Use Tagify to display tags",
   "openthesaurus": "false",
-  "openthesaurus-comment": "default false | Add call to openthesaurus API to enrich words",
+  "openthesaurus-comment": "default false | Add call to openthesaurus API to enrich words (experimental)",
   "categories": {
     "assign-top": "true",
     "assign-top-comment": "default true | Return top tag (category) if keyword is found. Return the keyword else.",
