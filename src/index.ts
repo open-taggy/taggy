@@ -101,8 +101,12 @@ export class Taggy {
 
   handleEventListener() {
     console.log("INSIDE EVENT LISTENER");
-    console.log("WAITTIME", this.config.waittime);
+    // console.log("WAITTIME", this.config.waittime);
     this.outputField.style.backgroundColor = "#f2f102";
+    if (this.tagify) {
+      this.tagify.DOM.scope.style.setProperty("--tags-border-color", "#ef4d60");
+      this.tagify.DOM.scope.style.setProperty("background", "#f2f102");
+    }
     clearTimeout(this.timeout);
 
     // make a new timeout set to go off in 1000ms
@@ -114,9 +118,11 @@ export class Taggy {
         this.outputField
       );
 
-      this.outputField.style.backgroundColor = "#00000";
+      this.outputField.style.backgroundColor = "#ffffff";
+
       this.addTags(result);
     }, this.config.waittime);
+    console.log(this.outputField.style.backgroundColor);
   }
 
   setOutputField(outputField: HTMLInputElement) {
@@ -180,7 +186,7 @@ export class Taggy {
 
   async processAndAddTags(input: string, outputField: HTMLInputElement) {
     this.outputField.setAttribute("value", "");
-    if (this.tagify) {
+    if (this.tagify?.DOM?.scope?.parentNode) {
       console.log("before destroy", this.tagify);
       this.tagify.destroy();
       console.log("after destroy", this.tagify);
@@ -206,7 +212,15 @@ export class Taggy {
     } else {
       this.outputField.setAttribute("value", input);
     }
-    return this.tagify;
+    if (input && input != "") {
+      this.addFrequencyOutput();
+    }
+    console.log("ADDTAG BG", this.outputField.style.backgroundColor);
+  }
+
+  addFrequencyOutput() {
+    this.frequencyOutput.innerHTML =
+      "Top candidates: " + this.getMostFrequent().join(", ");
   }
 
   deleteTags() {
@@ -263,8 +277,8 @@ export class Taggy {
           console.log(response);
           let optValues: string[] = [];
           // response.baseforms?
-          if (response && response.synsets[0].terms) {
-            console.log(response.synsets[0].terms);
+          if (response && response.synsets[0]?.terms) {
+            console.log(response.synsets[0]?.terms);
 
             response.synsets[0].terms.forEach((term: any) => {
               optValues.push(normalizer(term.term));
@@ -283,8 +297,10 @@ export class Taggy {
             "word"
           );
 
+          console.log("FINAL FILTER", optValuesTokenized);
+
           optValuesTokenized.forEach((element) => {
-            enrichedInputValues.push(element.word);
+            enrichedInputValues.push(element.value);
           });
 
           console.log("LOOT", enrichedInputValues);
