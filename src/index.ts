@@ -3,7 +3,7 @@ import tokenizer from "wink-tokenizer";
 import stopwords from "stopwords-iso"; // object of stopwords for multiple languages
 // import stopwordsDE from de; // german stopwords
 import normalizer from "normalize-for-search";
-import { sample } from "lodash";
+import { sample, filter, max, groupBy, sortBy } from "lodash";
 import "regenerator-runtime/runtime";
 //import synonyms from "germansynonyms";
 import Tagify from "@yaireo/tagify";
@@ -32,14 +32,17 @@ let configDefinition: {
 export class Taggy {
   public name: string = "taggy";
   private tagify!: Tagify;
+  private tagifyOverride!: Tagify;
   private winkTokenizer: tokenizer;
   private stopwordsDE: any;
   private openthesaurus: any;
 
   private inputField!: HTMLInputElement;
-  private outputField: HTMLInputElement;
+  private outputField!: HTMLInputElement;
   private frequencyOutput: HTMLSpanElement;
-  private mostFrequent: string[] = [];
+  private overrideOutput: HTMLInputElement | undefined;
+  private mostFrequentWords: string[] = [];
+  private mostFrequentTopTags: any[] = [];
   private timeout: any = null;
 
   public config = configDefinition;
@@ -55,12 +58,14 @@ export class Taggy {
    * @param inputField Input field where user text goes
    * @param outputField Output field where the tags will show up
    * @param frequencyOutput Show frequency of identified tags
+   * @param overrideOutput Show identified top tags with possibility to override default detection
    * @param options Optional: Provide options for taggys behaviour
    */
   constructor(
     inputField: HTMLInputElement,
     outputField: HTMLInputElement,
     frequencyOutput: HTMLSpanElement,
+    overrideOutput: HTMLInputElement,
     options: Object
   ) {
     // config (again) -> TODO: SANITIZE CONFIG STUFF (ABOVE)
@@ -76,7 +81,7 @@ export class Taggy {
       include_top: this.INCLUDE_TOP,
       include_top_comment: configFile.categories["include-top-comment"],
     };
-    console.log("TAGGY CONFIG", this.config);
+    // console.log("TAGGY CONFIG", this.config);
 
     this.setInputField(inputField);
     this.outputField = outputField;
@@ -86,7 +91,15 @@ export class Taggy {
     this.openthesaurus = openthesaurus;
 
     if (this.outputField) this.outputField.setAttribute("readOnly", "true");
+    if (this.config.use_tagify) this.createTagify(this.outputField);
+
     this.frequencyOutput = frequencyOutput;
+
+    // this.overrideOutput = overrideOutput;
+    if (overrideOutput) {
+      this.setOverrideOutput(overrideOutput);
+      if (this.config.use_tagify) this.createTagifyOverride(overrideOutput);
+    }
 
     console.log("created a new taggy instance");
   }
@@ -94,12 +107,12 @@ export class Taggy {
   setInputField(inputField: HTMLInputElement) {
     this.inputField = inputField;
     this.inputField.addEventListener("input", (event) => {
-      this.handleEventListener();
+      this.handleInputEventListener();
     });
     console.log("taggy", "input field and handler set", this.inputField);
   }
 
-  handleEventListener() {
+  handleInputEventListener() {
     console.log("INSIDE EVENT LISTENER");
     // console.log("WAITTIME", this.config.waittime);
     this.outputField.style.backgroundColor = "#f2f102";
@@ -113,16 +126,11 @@ export class Taggy {
     this.timeout = setTimeout(async () => {
       // loader.style.display = "block";
 
-      let result = await this.processAndAddTags(
-        this.inputField.value,
-        this.outputField
-      );
+      await this.processAndAddTags(this.inputField.value, this.outputField);
 
       this.outputField.style.backgroundColor = "#ffffff";
-
-      this.addTags(result);
+      // this.addTags(result);
     }, this.config.waittime);
-    console.log(this.outputField.style.backgroundColor);
   }
 
   setOutputField(outputField: HTMLInputElement) {
@@ -137,8 +145,30 @@ export class Taggy {
     this.frequencyOutput = frequencyOutput;
   }
 
-  setMostFrequent(input: string[]) {
-    this.mostFrequent = input;
+  setOverrideOutput(overrideOutput: HTMLInputElement) {
+    this.overrideOutput = overrideOutput;
+    this.overrideOutput.addEventListener("click", (event) => {
+      this.handleOverrideOutputEventListener(event);
+    });
+    console.log("taggy", "Override field and handler set", this.overrideOutput);
+  }
+
+  handleOverrideOutputEventListener(event: MouseEvent) {
+    console.log("INSIDE EVENT LISTENER | OVERRIDE");
+    const target = event.target as HTMLElement;
+    if (target) console.log(target.innerHTML);
+  }
+
+  overrideTopTag(input: string) {
+    if (input) {
+      // if (this.config.use_tagify && this.tagify) {
+      //   this.tagify.removeTags();
+      //   this.tagify.addTags(input);
+      // } else {
+      //   this.
+      // }
+      this.addTags(input);
+    }
   }
 
   getConfig(): Object {
@@ -165,14 +195,28 @@ export class Taggy {
     }
   }
 
-  getMostFrequent() {
-    console.log("most frequent called", this.mostFrequent);
-    return this.mostFrequent;
+  getMostFrequentWords() {
+    console.log("most frequent called", this.mostFrequentWords);
+    return this.mostFrequentWords;
   }
 
   createTagify(inputElement: HTMLInputElement) {
-    this.tagify = new Tagify(inputElement);
+    if (this.config.use_tagify && !this.tagify) {
+      this.tagify = new Tagify(inputElement);
+    }
     return this.tagify;
+  }
+
+  createTagifyOverride(inputElement: HTMLInputElement) {
+    if (this.config.use_tagify) {
+      if (!this.tagifyOverride) {
+        this.tagifyOverride = new Tagify(this.overrideOutput!);
+      }
+      this.tagifyOverride.on("click", (e) => {
+        console.log(e.detail.data.value);
+        this.overrideTopTag(e.detail.data.value);
+      });
+    }
   }
 
   async process(input: string) {
@@ -185,42 +229,69 @@ export class Taggy {
   }
 
   async processAndAddTags(input: string, outputField: HTMLInputElement) {
-    this.outputField.setAttribute("value", "");
-    if (this.tagify?.DOM?.scope?.parentNode) {
-      console.log("before destroy", this.tagify);
-      this.tagify.destroy();
-      console.log("after destroy", this.tagify);
-    }
+    // this.outputField.setAttribute("value", "");
+    // if (this.tagify?.DOM?.scope?.parentNode) {
+    //   this.tagify.destroy();
+    //   console.log("destroyed tagify");
+    // }
 
     let processedInput = await this.processInput(input);
-    // let mostFrequent = taggy.getMostFrequent();
-    this.outputField.setAttribute("value", processedInput[0]);
-    outputField.value = processedInput[0];
+    // let mostFrequentWords = taggy.getMostFrequentWords();
+    // this.outputField.setAttribute("value", processedInput[0]);
+    // outputField.value = processedInput[0];
 
-    // TODO -> modularize
-    if (this.config.use_tagify) {
-      this.tagify = this.createTagify(outputField);
-      this.tagify.removeAllTags();
-      this.tagify.addTags(processedInput[0]);
-    }
+    this.addTags(processedInput[0]);
+
+    // // TODO -> modularize
+    // if (this.config.use_tagify) {
+    //   this.tagify = this.createTagify(outputField);
+    //   this.tagify.removeAllTags();
+    //   this.tagify.addTags(processedInput[0]);
+    // }
     return processedInput[0];
   }
 
   addTags(input: string) {
-    if (this.config.use_tagify) {
-      this.tagify.addTags(input);
-    } else {
-      this.outputField.setAttribute("value", input);
-    }
     if (input && input != "") {
+      // set main tag for tagify
+      if (this.config.use_tagify) {
+        this.tagify.removeAllTags();
+        this.tagify.addTags(input);
+      } else {
+        this.outputField.setAttribute("value", input);
+      }
+      // set override tags
+      if (this.overrideOutput && this.mostFrequentTopTags) {
+        this.addOverrideOutput();
+      }
+      // set most frequent words
       this.addFrequencyOutput();
     }
-    console.log("ADDTAG BG", this.outputField.style.backgroundColor);
   }
 
   addFrequencyOutput() {
     this.frequencyOutput.innerHTML =
-      "Top candidates: " + this.getMostFrequent().join(", ");
+      "Word(s) with most Occurencies: " +
+      this.getMostFrequentWords().join(", ");
+  }
+
+  addOverrideOutput() {
+    let topTags: string[] = [];
+    Object.values(this.mostFrequentTopTags).forEach((element) =>
+      // topTags.push(element.category + " (" + element.count + ")")
+      topTags.push(element.category)
+    );
+    if (this.overrideOutput) {
+      if (this.config.use_tagify && this.tagify) {
+        // this.overrideOutput.innerHTML =
+        //   "Top detected categories: " + topTags.join(", ");
+        this.tagifyOverride.removeAllTags();
+        this.tagifyOverride.addTags(topTags);
+      } else {
+        // this.overrideOutput.innerHTML =
+        //   "Top detected categories: " + topTags.join(", ");
+      }
+    }
   }
 
   deleteTags() {
@@ -234,6 +305,14 @@ export class Taggy {
       return item.tag === type;
     });
     return tokenizedWords;
+  }
+
+  normalize(inputArray: string[]) {
+    let normalizedValues = [];
+    for (const element of inputArray) {
+      normalizedValues.push(normalizer(element));
+    }
+    return normalizedValues;
   }
 
   async processInput(input: string): Promise<string[]> {
@@ -264,7 +343,7 @@ export class Taggy {
     if (tokenizedValues.length < 2) return [];
 
     let enrichedInputValues: string[] = [];
-    this.mostFrequent = [];
+    this.mostFrequentWords = [];
 
     // don't call openthesaurus-API too often (-> results in too many requests error)
     if (this.config.opt_enabled && tokenizedValues.length < 20) {
@@ -386,29 +465,72 @@ export class Taggy {
     console.log("FINAL SET", finalSet);
     console.log(finalSet);
 
-    // matches with most occurencies
-    this.mostFrequent = modeArray(finalSet)!;
-    console.log("MOSTFREQUENT MODE ARRAY");
-    console.log(this.mostFrequent);
-
-    let finalValue = sample(this.mostFrequent)!;
-    console.log("FINALVALUE", finalValue);
-
     console.log(glossarData.tags);
     let searchGlossar = glossarData.tags;
 
+    let topTagCount: any = [];
+
+    let maxCount = 0;
     // if ASSIGN_TOP is set -> return top categegory
     if (this.config.assign_top) {
+      let count = 0;
       searchGlossar.forEach((category: any) => {
-        console.log(category);
-        category.words.forEach((word: string) => {
-          if (normalizer(word) == finalValue) {
-            console.log("MATCH FOR", category.name);
-            finalValue = category.name;
+        count = 0;
+        finalSet.forEach((element) => {
+          if (this.normalize(category.words).includes(element)) {
+            count += 1;
           }
         });
+        topTagCount.push({
+          category: category.name,
+          count: count,
+        });
+        if (count > maxCount) maxCount = count;
       });
     }
+
+    console.log("TOPCATFREQ", topTagCount);
+    // console.log("SORTBY", sortBy(topTagCount, ["category", "count"]));
+
+    let groupedMostFrequentTopTags = groupBy(topTagCount, "count");
+
+    console.log("GROUPBY", groupedMostFrequentTopTags);
+    console.log("LENGHT", Object.keys(groupedMostFrequentTopTags).length);
+    console.log("THISSSSSSS", groupedMostFrequentTopTags[maxCount]);
+    this.mostFrequentTopTags = groupedMostFrequentTopTags[maxCount];
+
+    // matches with most occurencies
+    this.mostFrequentWords = modeArray(finalSet)!;
+    console.log("MOSTFREQUENT MODE ARRAY");
+    console.log(this.mostFrequentWords);
+
+    let finalValue = sample(this.mostFrequentWords)!;
+    console.log("FINALVALUE BEFORE", finalValue);
+
+    // if ASSIGN_TOP is set -> return top categegory
+    if (this.config.assign_top) {
+      let topTags: string[] = [];
+      Object.values(this.mostFrequentTopTags).forEach((element) =>
+        // topTags.push(element.category + " (" + element.count + ")")
+        topTags.push(element.category)
+      );
+      let tempValue = sample(topTags);
+      if (tempValue) finalValue = tempValue;
+    }
+
+    // if (this.config.assign_top) {
+    //   searchGlossar.forEach((category: any) => {
+    //     console.log(category);
+    //     category.words.forEach((word: string) => {
+    //       if (normalizer(word) == finalValue) {
+    //         console.log("MATCH FOR", category.name);
+    //         finalValue = category.name;
+    //       }
+    //     });
+    //   });
+    // }
+    console.log("FINALVALUE AFTER", finalValue);
+
     return finalValue ? [finalValue] : [""];
 
     // console.log(returnValue);
@@ -432,6 +554,7 @@ function enrichWithOpenThesaurus(inputArray: string[]) {
   return enrichedArray;
 }
 
+// return an array of mode element(s) -> highest occurrences
 function modeArray(array: any) {
   if (array.length == 0) return null;
   var modeMap: any = {},

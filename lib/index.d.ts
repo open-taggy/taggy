@@ -4,13 +4,16 @@ import Tagify from "@yaireo/tagify";
 export declare class Taggy {
     name: string;
     private tagify;
+    private tagifyOverride;
     private winkTokenizer;
     private stopwordsDE;
     private openthesaurus;
     private inputField;
     private outputField;
     private frequencyOutput;
-    private mostFrequent;
+    private overrideOutput;
+    private mostFrequentWords;
+    private mostFrequentTopTags;
     private timeout;
     config: {
         use_tagify: boolean;
@@ -33,24 +36,30 @@ export declare class Taggy {
      * @param inputField Input field where user text goes
      * @param outputField Output field where the tags will show up
      * @param frequencyOutput Show frequency of identified tags
+     * @param overrideOutput Show identified top tags with possibility to override default detection
      * @param options Optional: Provide options for taggys behaviour
      */
-    constructor(inputField: HTMLInputElement, outputField: HTMLInputElement, frequencyOutput: HTMLSpanElement, options: Object);
+    constructor(inputField: HTMLInputElement, outputField: HTMLInputElement, frequencyOutput: HTMLSpanElement, overrideOutput: HTMLInputElement, options: Object);
     setInputField(inputField: HTMLInputElement): void;
-    handleEventListener(): void;
+    handleInputEventListener(): void;
     setOutputField(outputField: HTMLInputElement): void;
     setFrequencyOutput(frequencyOutput: HTMLSpanElement): void;
-    setMostFrequent(input: string[]): void;
+    setOverrideOutput(overrideOutput: HTMLInputElement): void;
+    handleOverrideOutputEventListener(event: MouseEvent): void;
+    overrideTopTag(input: string): void;
     getConfig(): Object;
     getGlossar(): JSON;
     setOption(option: string, value: boolean): void;
-    getMostFrequent(): string[];
+    getMostFrequentWords(): string[];
     createTagify(inputElement: HTMLInputElement): Tagify<Tagify.TagData>;
+    createTagifyOverride(inputElement: HTMLInputElement): void;
     process(input: string): Promise<string[]>;
     processAndAddTags(input: string, outputField: HTMLInputElement): Promise<string>;
     addTags(input: string): void;
     addFrequencyOutput(): void;
+    addOverrideOutput(): void;
     deleteTags(): void;
     tokenize(input: string, type?: string): any[];
+    normalize(inputArray: string[]): string[];
     processInput(input: string): Promise<string[]>;
 }
