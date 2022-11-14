@@ -1,0 +1,49 @@
+{
+  "tags": [
+    {
+      "name": "Print-Abo",
+      "words": ["printausgabe", "gedruckt", "postkasten", "zeitung"]
+    },
+    {
+      "name": "Online-Abo",
+      "words": ["website", "kommentarfunktion", "forum"]
+    },
+    {
+      "name": "ePaper-Abo",
+      "words": [
+        "eReader",
+        "kindle",
+        "tolino",
+        "cloud",
+        "download",
+        "connection",
+        "error"
+      ]
+    },
+    {
+      "name": "Nachsendeauftrag",
+      "words": [
+        "nachsendung",
+        "urlaub",
+        "umzug",
+        "reise",
+        "verreisen",
+        "ausland",
+        "adresse"
+      ]
+    },
+    {
+      "name": "Reklamation",
+      "words": [
+        "beschwerde",
+        "beschweren",
+        "ärgerlich",
+        "frechheit",
+        "unverschämt",
+        "verzögert",
+        "nicht gekommen",
+        "verschwunden"
+      ]
+    }
+  ]
+}

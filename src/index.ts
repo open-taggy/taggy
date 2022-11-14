@@ -3,7 +3,15 @@ import tokenizer from "wink-tokenizer";
 import stopwords from "stopwords-iso"; // object of stopwords for multiple languages
 // import stopwordsDE from de; // german stopwords
 import normalizer from "normalize-for-search";
-import { sample, filter, max, groupBy, sortBy } from "lodash";
+import {
+  sample,
+  filter,
+  max,
+  groupBy,
+  sortBy,
+  transform,
+  random,
+} from "lodash";
 import "regenerator-runtime/runtime";
 //import synonyms from "germansynonyms";
 import Tagify from "@yaireo/tagify";
@@ -13,7 +21,7 @@ import Tagify from "@yaireo/tagify";
 // import fs from "fs";
 // include wink-nlp (lemmatizing)
 const openthesaurus = require("openthesaurus");
-const glossarData = require("../data/glossar.json");
+const glossarData = require("../data/glossar-abo.json");
 const configFile = require("../data/config.json");
 
 export class Taggy {
@@ -28,6 +36,7 @@ export class Taggy {
   private outputField!: HTMLInputElement;
   private frequencyOutput: HTMLSpanElement;
   private overrideOutput: HTMLInputElement | undefined;
+  private loaderElement: HTMLElement;
   private mostFrequentWords: string[] = [];
   private mostFrequentTopTags: any[] = [];
   private timeout: any = null;
@@ -51,6 +60,7 @@ export class Taggy {
    * @param outputField Output field where the tags will show up
    * @param frequencyOutput Show frequency of identified tags
    * @param overrideOutput Show identified top tags with possibility to override default detection
+   * @param loaderElement Add a loading indicator (spinner) that gets hidden on completion
    * @param options Optional: Provide options for taggys behaviour
    */
   constructor(
@@ -58,18 +68,20 @@ export class Taggy {
     outputField: HTMLInputElement,
     frequencyOutput: HTMLSpanElement,
     overrideOutput: HTMLInputElement,
+    loaderElement: HTMLElement,
     options: Object
   ) {
     // console.log("TAGGY CONFIG", this.config);
 
     this.setInputField(inputField);
     this.outputField = outputField;
+    this.loaderElement = loaderElement;
 
     this.winkTokenizer = new tokenizer();
     this.stopwordsDE = stopwords.de;
     this.openthesaurus = openthesaurus;
 
-    if (this.outputField) this.outputField.setAttribute("readOnly", "true");
+    // if (this.outputField) this.outputField.setAttribute("readOnly", "true");
     if (this.config.use_tagify) this.createTagify(this.outputField);
 
     this.frequencyOutput = frequencyOutput;
@@ -99,7 +111,11 @@ export class Taggy {
   handleInputEventListener() {
     console.log("INSIDE EVENT LISTENER");
     // console.log("WAITTIME", this.config.waittime);
-    this.outputField.style.backgroundColor = "#f2f102";
+    // this.outputField.style.backgroundColor = "#f2f102";
+    this.loaderElement.style.setProperty("display", "block");
+    if (this.outputField.lastChild)
+      this.outputField.removeChild(this.outputField.lastChild!);
+
     if (this.tagify) {
       this.tagify.DOM.scope.style.setProperty("--tags-border-color", "#ef4d60");
       this.tagify.DOM.scope.style.setProperty("background", "#f2f102");
@@ -112,9 +128,16 @@ export class Taggy {
 
       await this.processAndAddTags(this.inputField.value, this.outputField);
 
-      this.outputField.style.backgroundColor = "#ffffff";
-      this.tagify.DOM.scope.style.setProperty("--tags-border-color", "#b3d4fc");
-      this.tagify.DOM.scope.style.setProperty("background", "#ffffff");
+      // this.outputField.style.backgroundColor = "#ffffff";
+      this.loaderElement.style.setProperty("display", "none");
+
+      if (this.tagify) {
+        this.tagify.DOM.scope.style.setProperty(
+          "--tags-border-color",
+          "#b3d4fc"
+        );
+        this.tagify.DOM.scope.style.setProperty("background", "#ffffff");
+      }
 
       // this.addTags(result);
     }, this.config.waittime);
@@ -177,9 +200,39 @@ export class Taggy {
 
   createTagify(inputElement: HTMLInputElement) {
     if (this.config.use_tagify && !this.tagify) {
-      this.tagify = new Tagify(inputElement);
+      this.tagify = new Tagify(inputElement, {
+        userInput: false,
+        editTags: false,
+        transformTag: this.transformTagifyTag,
+      });
+      this.tagify.setReadonly(true);
+      // this.tagify.DOM.scope.style.setProperty("--tag-bg", "#bee3f8");
+      // this.tagify.DOM.scope.style.setProperty("--tag-text-color", "#2b6cb0");
+      // this.tagify.DOM.scope.style.setProperty("--tag-border-radius", "12px");
+      // this.tagify.DOM.scope.style.setProperty("--tag-pad", "0.6em");
+      this.tagify.DOM.scope.style.setProperty("--readonly-striped", "0");
     }
     return this.tagify;
+  }
+
+  transformTagifyTag(tagData: Tagify.TagData) {
+    let randomColor = getRandomColor();
+    tagData.color = randomColor;
+    console.log("randomColor", randomColor);
+
+    tagData.style =
+      "--tag-bg:" + tagData.color + ";" + "--tag-border-radius: 20px";
+
+    function getRandomColor() {
+      function rand(min: number, max: number) {
+        return min + Math.random() * (max - min);
+      }
+      let h = rand(1, 360) | 0,
+        s = rand(40, 70) | 0,
+        l = rand(65, 72) | 0;
+
+      return "hsl(" + h + "," + s + "%," + l + "%)";
+    }
   }
 
   createTagifyOverride(inputElement: HTMLInputElement) {
@@ -187,7 +240,9 @@ export class Taggy {
       if (!this.tagifyOverride) {
         this.tagifyOverride = new Tagify(this.overrideOutput!, {
           userInput: false,
+          transformTag: this.transformTagifyTag,
         });
+        this.tagifyOverride.DOM.scope.style.setProperty("border", "none");
       }
       this.tagifyOverride.on("click", (e) => {
         console.log(e.detail.data.value);
@@ -219,7 +274,9 @@ export class Taggy {
 
   async process(input: string) {
     this.outputField.setAttribute("value", "");
+    console.log("loaderElement", this.loaderElement);
     let processedInput = await this.processInput(input);
+    this.loaderElement.style.setProperty("display", "none");
     console.log("processedinput", processedInput[0]);
     processedInput[0] = processedInput[0] ? processedInput[0] : "";
     this.outputField.setAttribute("value", processedInput[0]);
@@ -227,19 +284,37 @@ export class Taggy {
   }
 
   async processAndAddTags(input: string, outputField: HTMLInputElement) {
+    if (this.loaderElement)
+      this.loaderElement.style.setProperty("display", "block");
     let processedInput = await this.processInput(input);
+    if (this.loaderElement)
+      this.loaderElement.style.setProperty("display", "none");
     this.addTags(processedInput[0]);
   }
 
   addTags(input: string) {
-    this.tagify.removeAllTags();
-    this.tagifyOverride.removeAllTags();
+    if (this.outputField.lastChild)
+      this.outputField.removeChild(this.outputField.lastChild!);
+
+    console.log("addtag", input);
+    if (this.config.use_tagify) {
+      if (!this.tagify) this.createTagify(this.outputField);
+      if (!this.tagifyOverride) this.createTagifyOverride(this.overrideOutput!);
+      this.tagify.removeAllTags();
+      this.tagifyOverride.removeAllTags();
+    }
     if (input && input != "") {
       // set main tag for tagify
       if (this.config.use_tagify) {
         this.tagify.addTags(input);
       } else {
         this.outputField.setAttribute("value", input);
+        this.outputField.value = input;
+        console.log("field", this.outputField);
+        const taggyTag = document.createElement("div");
+        taggyTag.classList.add("taggy-tag");
+        taggyTag.innerText = input;
+        this.outputField.appendChild(taggyTag);
       }
       // set override tags
       if (this.overrideOutput && this.mostFrequentTopTags) {
@@ -268,8 +343,7 @@ export class Taggy {
         //   "Top detected categories: " + topTags.join(", ");
         this.tagifyOverride.addTags(topTags);
       } else {
-        // this.overrideOutput.innerHTML =
-        //   "Top detected categories: " + topTags.join(", ");
+        this.overrideOutput.value = topTags.join(", ");
       }
     }
   }

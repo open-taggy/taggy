@@ -1,5 +1,5 @@
 {
-  "use-tagify": "true",
+  "use-tagify": "false",
   "use-tagify-comment": "default true | Use Tagify to display tags",
   "openthesaurus": "false",
   "openthesaurus-comment": "default false | Add call to openthesaurus API to enrich words (experimental)",
