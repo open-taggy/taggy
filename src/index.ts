@@ -21,7 +21,7 @@ import Tagify from "@yaireo/tagify";
 // import fs from "fs";
 // include wink-nlp (lemmatizing)
 const openthesaurus = require("openthesaurus");
-const glossarData = require("../data/glossar-abo.json");
+const glossarData = require("../data/glossar-energy.json");
 const configFile = require("../data/config.json");
 
 export class Taggy {
@@ -34,6 +34,7 @@ export class Taggy {
 
   private inputField!: HTMLInputElement;
   private outputField!: HTMLInputElement;
+  private submitButton!: HTMLElement;
   private frequencyOutput: HTMLSpanElement;
   private overrideOutput: HTMLInputElement | undefined;
   private loaderElement: HTMLElement;
@@ -44,6 +45,8 @@ export class Taggy {
   public config = {
     use_tagify: configFile["use-tagify"] === "true",
     use_tagify_comment: configFile["use-tagify-comment"],
+    use_submit: configFile["use-submit"] === "true",
+    use_submit_comment: configFile["use-submit-comment"],
     waittime: configFile["waittime"],
     waittime_comment: configFile["waittime-comment"],
     opt_enabled: configFile["openthesaurus"] === "true",
@@ -58,6 +61,7 @@ export class Taggy {
    * Create a new instance of taggy
    * @param inputField Input field where user text goes
    * @param outputField Output field where the tags will show up
+   * @param submitButton Submit button to trigger processing instead of automatic behavior while typing
    * @param frequencyOutput Show frequency of identified tags
    * @param overrideOutput Show identified top tags with possibility to override default detection
    * @param loaderElement Add a loading indicator (spinner) that gets hidden on completion
@@ -66,6 +70,7 @@ export class Taggy {
   constructor(
     inputField: HTMLInputElement,
     outputField: HTMLInputElement,
+    submitButton: HTMLElement,
     frequencyOutput: HTMLSpanElement,
     overrideOutput: HTMLInputElement,
     loaderElement: HTMLElement,
@@ -73,9 +78,11 @@ export class Taggy {
   ) {
     // console.log("TAGGY CONFIG", this.config);
 
+    this.setSubmitButton(submitButton);
     this.setInputField(inputField);
     this.outputField = outputField;
     this.loaderElement = loaderElement;
+    // this.submitButton = submitButton;
 
     this.winkTokenizer = new tokenizer();
     this.stopwordsDE = stopwords.de;
@@ -102,14 +109,42 @@ export class Taggy {
 
   setInputField(inputField: HTMLInputElement) {
     this.inputField = inputField;
-    this.inputField.addEventListener("input", (event) => {
-      this.handleInputEventListener();
+    console.log("SET INPUT FIELD");
+    console.log(
+      "USE_SUBMIT",
+      this.config.use_submit,
+      "BUTTON",
+      this.submitButton
+    );
+    if (this.config.use_submit && this.submitButton) {
+      return;
+      // fall back to eventlistener when no submitbutton specified
+    } else {
+      this.inputField.addEventListener("input", (event) => {
+        this.handleInputEventListener();
+      });
+      console.log("taggy", "input field and handler set", this.inputField);
+    }
+  }
+
+  setSubmitButton(submitButton: HTMLElement) {
+    console.log("SET SUBMIT BUTTON");
+    this.submitButton = submitButton;
+    this.submitButton.addEventListener("click", (event) => {
+      console.log("SUBMIT BUTTON CLICKED");
+      if (this.config.use_submit) {
+        this.handleSubmitButtonEventListener();
+      }
     });
-    console.log("taggy", "input field and handler set", this.inputField);
+    console.log("taggy", "submit button and handler set", this.submitButton);
   }
 
   handleInputEventListener() {
     console.log("INSIDE EVENT LISTENER");
+    if (this.config.use_submit) {
+      console.log("but doing nothing");
+      return;
+    }
     // console.log("WAITTIME", this.config.waittime);
     // this.outputField.style.backgroundColor = "#f2f102";
     this.loaderElement.style.setProperty("display", "block");
@@ -141,6 +176,11 @@ export class Taggy {
 
       // this.addTags(result);
     }, this.config.waittime);
+  }
+
+  async handleSubmitButtonEventListener() {
+    console.log("INSIDE EVENT LISTENER");
+    await this.processAndAddTags(this.inputField.value, this.outputField);
   }
 
   setOutputField(outputField: HTMLInputElement) {
@@ -181,6 +221,27 @@ export class Taggy {
     console.log("setting", option, "to", value);
     if (option == "use_tagify") {
       this.config.use_tagify = value;
+    }
+    if (option == "use_submit") {
+      console.log("USE_SUBMIT OPTION", value);
+      this.config.use_submit = value;
+      if (value) {
+        // this.handleSubmitButtonEventListener();
+        this.setSubmitButton(this.submitButton);
+        console.log(this.inputField);
+        // remove all event listeners from element
+        // this.inputField.replaceWith(this.inputField.cloneNode(true));
+        this.setInputField(this.inputField);
+
+        // this.inputField.removeEventListener("input", (event) => {
+        //   this.handleInputEventListener();
+        // });
+      } else {
+        this.setInputField(this.inputField);
+
+        // this.submitButton.replaceWith(this.submitButton.cloneNode(true));
+        // this.handleInputEventListener();
+      }
     }
     if (option == "assign_top") {
       this.config.assign_top = value;
@@ -312,7 +373,8 @@ export class Taggy {
         this.outputField.value = input;
         console.log("field", this.outputField);
         const taggyTag = document.createElement("div");
-        taggyTag.classList.add("taggy-tag");
+        // taggyTag.classList.add("taggy-tag");
+        taggyTag.id = "taggy-tag";
         taggyTag.innerText = input;
         this.outputField.appendChild(taggyTag);
       }

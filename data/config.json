@@ -1,6 +1,8 @@
 {
   "use-tagify": "false",
   "use-tagify-comment": "default true | Use Tagify to display tags",
+  "use-submit": "true",
+  "use-submit-comment": "default false | Use submit button to process input instead of automatic behavior while typing | Only works with defined submitButton",
   "openthesaurus": "false",
   "openthesaurus-comment": "default false | Add call to openthesaurus API to enrich words (experimental)",
   "waittime": 1000,
