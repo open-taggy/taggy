@@ -1,16 +1,16 @@
 {
   "use-tagify": "false",
-  "use-tagify-comment": "default true | Use Tagify to display tags",
+  "use-tagify-comment": "Use Tagify to display tags | default: true",
   "use-submit": "true",
-  "use-submit-comment": "default false | Use submit button to process input instead of automatic behavior while typing | Only works with defined submitButton",
+  "use-submit-comment": "Use submit button to process input instead of automatic behavior while typing | Only works with defined submitButton | default: false",
   "openthesaurus": "false",
-  "openthesaurus-comment": "default false | Add call to openthesaurus API to enrich words (experimental)",
+  "openthesaurus-comment": "Add call to openthesaurus API to enrich words (experimental) | default: false",
   "waittime": 1000,
-  "waittime-comment": "default 1000 | Set time to wait for processing after keyboard input",
+  "waittime-comment": "Set time to wait for processing after keyboard input | default: 1000",
   "categories": {
     "assign-top": "true",
-    "assign-top-comment": "default true | Return top tag (category) if keyword is found. Return the keyword else.",
+    "assign-top-comment": "true -> return top tag (category) of found keyword; false -> return the keyword itself | default: true",
     "include-top": "false",
-    "include-top-comment": "default false | Include top tag (category) as a keyword"
+    "include-top-comment": "Include top tag (category) as a keyword | default: false"
   }
 }

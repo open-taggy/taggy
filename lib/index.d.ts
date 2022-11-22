@@ -59,8 +59,7 @@ export declare class Taggy {
     transformTagifyTag(tagData: Tagify.TagData): void;
     createTagifyOverride(inputElement: HTMLInputElement): void;
     callOpenThesaurusAPI(inputArray: string[]): Promise<string[]>;
-    process(input: string): Promise<string[]>;
-    processAndAddTags(input: string, outputField: HTMLInputElement): Promise<void>;
+    processAndAddTags(input: string, outputField: HTMLInputElement): Promise<boolean>;
     addTags(input: string): void;
     addFrequencyOutput(): void;
     addOverrideOutput(): void;

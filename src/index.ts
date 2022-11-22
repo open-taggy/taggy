@@ -77,6 +77,7 @@ export class Taggy {
     options: Object
   ) {
     // console.log("TAGGY CONFIG", this.config);
+    console.log("hello, this is taggy 0.1");
 
     this.setSubmitButton(submitButton);
     this.setInputField(inputField);
@@ -140,14 +141,15 @@ export class Taggy {
   }
 
   handleInputEventListener() {
-    console.log("INSIDE EVENT LISTENER");
+    console.log("INSIDE EVENT LISTENER | INPUT KEYSTROKE");
     if (this.config.use_submit) {
       console.log("but doing nothing");
       return;
     }
     // console.log("WAITTIME", this.config.waittime);
     // this.outputField.style.backgroundColor = "#f2f102";
-    this.loaderElement.style.setProperty("display", "block");
+    if (this.loaderElement)
+      this.loaderElement.style.setProperty("display", "block");
     if (this.outputField.lastChild)
       this.outputField.removeChild(this.outputField.lastChild!);
 
@@ -179,8 +181,17 @@ export class Taggy {
   }
 
   async handleSubmitButtonEventListener() {
-    console.log("INSIDE EVENT LISTENER");
+    console.log("INSIDE EVENT LISTENER | BUTTON");
+    if (this.loaderElement) {
+      console.log("EV before");
+      console.log("loaderELEMENT", this.loaderElement);
+      this.loaderElement.style.setProperty("display", "block");
+    }
     await this.processAndAddTags(this.inputField.value, this.outputField);
+    if (this.loaderElement) {
+      console.log("EV after");
+      this.loaderElement.style.setProperty("display", "none");
+    }
   }
 
   setOutputField(outputField: HTMLInputElement) {
@@ -221,6 +232,10 @@ export class Taggy {
     console.log("setting", option, "to", value);
     if (option == "use_tagify") {
       this.config.use_tagify = value;
+      if (!value) {
+        this.tagify.destroy();
+        this.tagifyOverride.destroy();
+      }
     }
     if (option == "use_submit") {
       console.log("USE_SUBMIT OPTION", value);
@@ -333,24 +348,30 @@ export class Taggy {
     return returnSet;
   }
 
-  async process(input: string) {
-    this.outputField.setAttribute("value", "");
-    console.log("loaderElement", this.loaderElement);
-    let processedInput = await this.processInput(input);
-    this.loaderElement.style.setProperty("display", "none");
-    console.log("processedinput", processedInput[0]);
-    processedInput[0] = processedInput[0] ? processedInput[0] : "";
-    this.outputField.setAttribute("value", processedInput[0]);
-    return processedInput;
-  }
+  // async process(input: string) {
+  //   this.outputField.setAttribute("value", "");
+  //   console.log("loaderElement", this.loaderElement);
+  //   this.loaderElement.style.setProperty("display", "block");
+  //   let processedInput = await this.processInput(input);
+  //   this.loaderElement.style.setProperty("display", "none");
+  //   console.log("processedinput", processedInput[0]);
+  //   processedInput[0] = processedInput[0] ? processedInput[0] : "";
+  //   this.outputField.setAttribute("value", processedInput[0]);
+  //   return processedInput;
+  // }
 
-  async processAndAddTags(input: string, outputField: HTMLInputElement) {
-    if (this.loaderElement)
-      this.loaderElement.style.setProperty("display", "block");
+  async processAndAddTags(
+    input: string,
+    outputField: HTMLInputElement
+  ): Promise<boolean> {
+    console.log("awaiting processedInput");
     let processedInput = await this.processInput(input);
-    if (this.loaderElement)
-      this.loaderElement.style.setProperty("display", "none");
-    this.addTags(processedInput[0]);
+    if (processedInput) {
+      console.log("done with processedInput");
+      this.addTags(processedInput[0]);
+      return Promise.resolve(true);
+    }
+    return Promise.reject(false);
   }
 
   addTags(input: string) {
