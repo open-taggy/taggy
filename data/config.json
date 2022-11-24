@@ -2,7 +2,7 @@
   "use-tagify": "false",
   "use-tagify-comment": "Use Tagify to display tags | default: true",
   "use-submit": "true",
-  "use-submit-comment": "Use submit button to process input instead of automatic behavior while typing | Only works with defined submitButton | default: false",
+  "use-submit-comment": "Use submit button to process input instead of automatic behavior while typing (only works with defined submitButton) | default: false",
   "openthesaurus": "false",
   "openthesaurus-comment": "Add call to openthesaurus API to enrich words (experimental) | default: false",
   "waittime": 1000,

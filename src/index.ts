@@ -36,7 +36,7 @@ export class Taggy {
   private outputField!: HTMLInputElement;
   private submitButton!: HTMLElement;
   private frequencyOutput: HTMLSpanElement;
-  private overrideOutput: HTMLInputElement | undefined;
+  private overrideOutput!: HTMLInputElement;
   private loaderElement: HTMLElement;
   private mostFrequentWords: string[] = [];
   private mostFrequentTopTags: any[] = [];
@@ -217,7 +217,11 @@ export class Taggy {
   handleOverrideOutputEventListener(event: MouseEvent) {
     console.log("INSIDE EVENT LISTENER | OVERRIDE");
     const target = event.target as HTMLElement;
+
+    // prevent container above to be clickabe -> only tag-div itself
+    if (event.target == event.currentTarget) return;
     if (target) console.log(target.innerHTML);
+    this.addTags(target.innerHTML);
   }
 
   getConfig(): Object {
@@ -365,6 +369,7 @@ export class Taggy {
     outputField: HTMLInputElement
   ): Promise<boolean> {
     console.log("awaiting processedInput");
+    this.deleteTags();
     let processedInput = await this.processInput(input);
     if (processedInput) {
       console.log("done with processedInput");
@@ -375,6 +380,7 @@ export class Taggy {
   }
 
   addTags(input: string) {
+    this.deleteTags();
     if (this.outputField.lastChild)
       this.outputField.removeChild(this.outputField.lastChild!);
 
@@ -385,20 +391,22 @@ export class Taggy {
       this.tagify.removeAllTags();
       this.tagifyOverride.removeAllTags();
     }
-    if (input && input != "") {
-      // set main tag for tagify
-      if (this.config.use_tagify) {
-        this.tagify.addTags(input);
-      } else {
-        this.outputField.setAttribute("value", input);
-        this.outputField.value = input;
-        console.log("field", this.outputField);
-        const taggyTag = document.createElement("div");
-        // taggyTag.classList.add("taggy-tag");
-        taggyTag.id = "taggy-tag";
-        taggyTag.innerText = input;
-        this.outputField.appendChild(taggyTag);
-      }
+    // if (input && input != "") {
+    // set main tag for tagify
+    if (this.config.use_tagify) {
+      this.tagify.addTags(input);
+    } else {
+      this.outputField.setAttribute("value", input);
+      this.outputField.value = input;
+      console.log("field", this.outputField);
+      const taggyTag = document.createElement("div");
+      // taggyTag.classList.add("taggy-tag");
+      // taggyTag.id = "taggy-tag";
+      taggyTag.classList.add("taggy-tag");
+      if (!input || input == "") input = "No matching tag found";
+      taggyTag.innerText = input;
+      this.outputField.appendChild(taggyTag);
+      // }
       // set override tags
       if (this.overrideOutput && this.mostFrequentTopTags) {
         this.addOverrideOutput();
@@ -426,15 +434,38 @@ export class Taggy {
         //   "Top detected categories: " + topTags.join(", ");
         this.tagifyOverride.addTags(topTags);
       } else {
-        this.overrideOutput.value = topTags.join(", ");
+        // this.overrideOutput.value = topTags.join(", ");
+
+        this.overrideOutput.setAttribute("value", topTags.join(", "));
+        topTags.forEach((tag) => {
+          let taggyTagOverride = document.createElement("div");
+          // taggyTag.classList.add("taggy-tag");
+          // taggyTagOverride.id = "taggy-tag";
+          taggyTagOverride.classList.add("taggy-tag", "override");
+          taggyTagOverride.innerText = tag;
+          this.overrideOutput.appendChild(taggyTagOverride);
+        });
+
+        // this.outputField.value = input;
+        // console.log("field", this.outputField);
+        // const taggyTag = document.createElement("div");
+        // // taggyTag.classList.add("taggy-tag");
+        // taggyTag.id = "taggy-tag";
+        // taggyTag.innerText = input;
+        // this.outputField.appendChild(taggyTag);
       }
     }
   }
 
   deleteTags() {
     console.log("called deleteTags");
-    this.tagify.removeTags();
-    this.tagifyOverride.removeAllTags();
+    if (this.tagify) this.tagify.removeTags();
+    if (this.tagifyOverride) this.tagifyOverride.removeAllTags();
+    // this.overrideOutput.innerHTML = '';
+    while (this.overrideOutput.firstChild) {
+      console.log("REMOVE CHILD", this.overrideOutput.firstChild);
+      this.overrideOutput.removeChild(this.overrideOutput.firstChild);
+    }
   }
 
   tokenize(input: string, type: string = "word"): string[] {
