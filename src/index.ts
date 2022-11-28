@@ -21,7 +21,7 @@ import Tagify from "@yaireo/tagify";
 // import fs from "fs";
 // include wink-nlp (lemmatizing)
 const openthesaurus = require("openthesaurus");
-const glossarData = require("../data/glossar-energy.json");
+const glossarData = require("../data/glossar.json");
 const configFile = require("../data/config.json");
 
 export class Taggy {
@@ -150,8 +150,9 @@ export class Taggy {
     // this.outputField.style.backgroundColor = "#f2f102";
     if (this.loaderElement)
       this.loaderElement.style.setProperty("display", "block");
-    if (this.outputField.lastChild)
-      this.outputField.removeChild(this.outputField.lastChild!);
+    // if (this.outputField.lastChild)
+    //   this.outputField.removeChild(this.outputField.lastChild!);
+    this.deleteTags();
 
     if (this.tagify) {
       this.tagify.DOM.scope.style.setProperty("--tags-border-color", "#ef4d60");
@@ -187,11 +188,18 @@ export class Taggy {
       console.log("loaderELEMENT", this.loaderElement);
       this.loaderElement.style.setProperty("display", "block");
     }
-    await this.processAndAddTags(this.inputField.value, this.outputField);
-    if (this.loaderElement) {
+
+    this.deleteTags();
+
+    // add loading-indicator -> helpful for UX
+    clearTimeout(this.timeout);
+    this.timeout = setTimeout(async () => {
       console.log("EV after");
-      this.loaderElement.style.setProperty("display", "none");
-    }
+      await this.processAndAddTags(this.inputField.value, this.outputField);
+      if (this.loaderElement) {
+        this.loaderElement.style.setProperty("display", "none");
+      }
+    }, this.config.waittime);
   }
 
   setOutputField(outputField: HTMLInputElement) {
@@ -403,16 +411,20 @@ export class Taggy {
       // taggyTag.classList.add("taggy-tag");
       // taggyTag.id = "taggy-tag";
       taggyTag.classList.add("taggy-tag");
-      if (!input || input == "") input = "No matching tag found";
+      if (!input || input == "") {
+        input = "No matching tag found";
+        taggyTag.classList.add("not-found");
+      } else {
+        // }
+        // set override tags
+        if (this.overrideOutput && this.mostFrequentTopTags) {
+          this.addOverrideOutput();
+        }
+        // set most frequent words
+        this.addFrequencyOutput();
+      }
       taggyTag.innerText = input;
       this.outputField.appendChild(taggyTag);
-      // }
-      // set override tags
-      if (this.overrideOutput && this.mostFrequentTopTags) {
-        this.addOverrideOutput();
-      }
-      // set most frequent words
-      this.addFrequencyOutput();
     }
   }
 
@@ -435,33 +447,77 @@ export class Taggy {
         this.tagifyOverride.addTags(topTags);
       } else {
         // this.overrideOutput.value = topTags.join(", ");
+        if (topTags.length > 1) {
+          let taggyTagOverrideTitle = document.createElement("h3");
+          taggyTagOverrideTitle.innerText =
+            "Multiple possibilities found. Click to override main tag";
+          taggyTagOverrideTitle.classList.add("override-title");
+          this.overrideOutput.prepend(taggyTagOverrideTitle);
 
-        this.overrideOutput.setAttribute("value", topTags.join(", "));
-        topTags.forEach((tag) => {
-          let taggyTagOverride = document.createElement("div");
-          // taggyTag.classList.add("taggy-tag");
-          // taggyTagOverride.id = "taggy-tag";
-          taggyTagOverride.classList.add("taggy-tag", "override");
-          taggyTagOverride.innerText = tag;
-          this.overrideOutput.appendChild(taggyTagOverride);
-        });
+          this.overrideOutput.setAttribute("value", topTags.join(", "));
+          topTags.forEach((tag) => {
+            let taggyTagOverride = document.createElement("div");
+            // taggyTag.classList.add("taggy-tag");
+            // taggyTagOverride.id = "taggy-tag";
+            taggyTagOverride.classList.add("taggy-tag", "override");
+            taggyTagOverride.innerText = tag;
 
-        // this.outputField.value = input;
-        // console.log("field", this.outputField);
-        // const taggyTag = document.createElement("div");
-        // // taggyTag.classList.add("taggy-tag");
-        // taggyTag.id = "taggy-tag";
-        // taggyTag.innerText = input;
-        // this.outputField.appendChild(taggyTag);
+            taggyTagOverride.classList.add(
+              "bg-" + this.getRandomTwColor() + "-200"
+            );
+
+            this.overrideOutput.appendChild(taggyTagOverride);
+          });
+
+          // this.outputField.value = input;
+          // console.log("field", this.outputField);
+          // const taggyTag = document.createElement("div");
+          // // taggyTag.classList.add("taggy-tag");
+          // taggyTag.id = "taggy-tag";
+          // taggyTag.innerText = input;
+          // this.outputField.appendChild(taggyTag);
+        }
       }
     }
   }
 
+  getRandomTwColor(): string {
+    const twColors = [
+      "Red",
+      "Orange",
+      "Amber",
+      "Yellow",
+      "Lime",
+      "Green",
+      "Emerald",
+      "Teal",
+      "Cyan",
+      "Sky",
+      "Blue",
+      "Indigo",
+      "Violet",
+      "Purple",
+      "Fuchsia",
+      "Pink",
+      "Rose",
+    ];
+
+    return twColors[Math.floor(Math.random() * twColors.length)].toLowerCase();
+  }
+
   deleteTags() {
     console.log("called deleteTags");
+
+    // delete tagify tags
     if (this.tagify) this.tagify.removeTags();
     if (this.tagifyOverride) this.tagifyOverride.removeAllTags();
     // this.overrideOutput.innerHTML = '';
+
+    // delete main tag
+    if (this.outputField.lastChild)
+      this.outputField.removeChild(this.outputField.lastChild!);
+
+    // delete override tags
     while (this.overrideOutput.firstChild) {
       console.log("REMOVE CHILD", this.overrideOutput.firstChild);
       this.overrideOutput.removeChild(this.overrideOutput.firstChild);

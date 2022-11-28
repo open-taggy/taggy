@@ -63,6 +63,7 @@ export declare class Taggy {
     addTags(input: string): void;
     addFrequencyOutput(): void;
     addOverrideOutput(): void;
+    getRandomTwColor(): string;
     deleteTags(): void;
     tokenize(input: string, type?: string): string[];
     normalize(inputArray: string[]): string[];
