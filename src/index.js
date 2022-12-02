@@ -1,12 +1,11 @@
 "use strict";
 exports.__esModule = true;
 exports.taggy = void 0;
-var readline = require("readline");
+// var readline = require("readline");
 var wink_tokenizer_1 = require("wink-tokenizer");
 var stopwords_iso_1 = require("stopwords-iso"); // object of stopwords for multiple languages
 // import stopwordsDE from de; // german stopwords
 var normalize_for_search_1 = require("normalize-for-search");
-var fs_1 = require("fs");
 var winkTokenizer = new wink_tokenizer_1["default"]();
 exports.taggy = {
     taggy: function () {

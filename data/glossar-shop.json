@@ -1,0 +1,16 @@
+{
+  "tags": [
+    {
+      "name": "Returnment",
+      "words": ["return", "shipment", "reposit"]
+    },
+    {
+      "name": "Feedback",
+      "words": ["love", "great work", "fan"]
+    },
+    {
+      "name": "Account Information",
+      "words": ["information", "account"]
+    }
+  ]
+}

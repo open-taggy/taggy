@@ -18,10 +18,9 @@ import Tagify from "@yaireo/tagify";
 
 // import jargon from "@clipperhouse/jargon";
 // import stackexchange from "@clipperhouse/jargon/stackexchange"; // a dictionary
-// import fs from "fs";
 // include wink-nlp (lemmatizing)
 const openthesaurus = require("openthesaurus");
-const glossarData = require("../data/glossar.json");
+const glossarData = require("../data/glossar-abo.json");
 const configFile = require("../data/config.json");
 
 export class Taggy {
@@ -506,8 +505,6 @@ export class Taggy {
   }
 
   deleteTags() {
-    console.log("called deleteTags");
-
     // delete tagify tags
     if (this.tagify) this.tagify.removeTags();
     if (this.tagifyOverride) this.tagifyOverride.removeAllTags();
@@ -587,16 +584,22 @@ export class Taggy {
       }
       for (const word of category.words) {
         glossarTags.push(normalizer(word));
-        // check input for "whitespace-words"
-        if (word.includes(" ")) {
-          if (normalizer(input).includes(word)) {
-            let matchArray = normalizer(input).matchAll(word);
-            for (let match of matchArray) {
-              combinedWordsReturnSet.push(match[0]);
-              console.log(match[0]);
-              console.log("whitespace-word match added", match[0]);
-            }
-          }
+      }
+      // check input for words with whitespaces and "-"
+    }
+
+    for (const word of glossarTags) {
+      if (word.includes(" ") || word.includes("-")) {
+        console.log("WORD WITH WHITE OR -", word);
+        if (normalizer(input).includes(word)) {
+          combinedWordsReturnSet.push(word);
+          console.log("whitespace-word match added", word);
+
+          // let matchArray = normalizer(input).matchAll(word);
+          // for (let match of matchArray) {
+          //   combinedWordsReturnSet.push(match[0]);
+          //   console.log("whitespace-word match added", match[0]);
+          // }
         }
       }
     }
