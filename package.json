@@ -1,16 +1,21 @@
 {
   "name": "@b1tsteller/taggy",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "taggy helps you to tag your content",
-  "main": "index.js",
+  "main": "./lib/index.js",
   "scripts": {
     "build": "tsc -w",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "npm run build",
+    "postbuild": ""
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/open-taggy/taggy-base.git"
   },
+  "files": [
+    "lib/**/*"
+  ],
   "keywords": [
     "tags",
     "tagging",
@@ -25,12 +30,13 @@
   },
   "homepage": "https://github.com/open-taggy/taggy-base#readme",
   "dependencies": {
-    "@clipperhouse/jargon": "^0.2.0",
-    "@yaireo/tagify": "^4.16.4",
     "lodash": "^4.17.21",
+    "@yaireo/tagify": "^4.16.4",
     "openthesaurus": "^1.0.2",
     "regenerator-runtime": "^0.13.9",
-    "wink-tokenizer": "^5.3.0"
+    "wink-tokenizer": "^5.3.0",
+    "normalize-for-search": "^2.1.0",
+    "stopwords-iso": "^1.1.0"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.186",
@@ -38,8 +44,6 @@
     "@types/normalize-for-search": "^2.1.0",
     "@types/wink-tokenizer": "^4.0.3",
     "@types/yaireo__tagify": "^4.16.0",
-    "normalize-for-search": "^2.1.0",
-    "stopwords-iso": "^1.1.0",
     "webpack-cli": "^5.0.0"
   }
 }

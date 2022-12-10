@@ -1,10 +1,18 @@
 /// <reference types="yaireo__tagify" />
 import "regenerator-runtime/runtime";
 import Tagify from "@yaireo/tagify";
+export interface IGlossaryData {
+    tags: ITag[];
+}
+export interface ITag {
+    name: string;
+    words: string[];
+}
 export declare class Taggy {
     name: string;
     private tagify;
     private tagifyOverride;
+    private glossaryData;
     private winkTokenizer;
     private stopwordsDE;
     private openthesaurus;
@@ -52,7 +60,8 @@ export declare class Taggy {
     setOverrideOutput(overrideOutput: HTMLInputElement): void;
     handleOverrideOutputEventListener(event: MouseEvent): void;
     getConfig(): Object;
-    getGlossar(): JSON;
+    getGlossary(): IGlossaryData;
+    setGlossary(glossaryToSet: IGlossaryData): void;
     setOption(option: string, value: boolean): void;
     getMostFrequentWords(): string[];
     createTagify(inputElement: HTMLInputElement): Tagify<Tagify.TagData>;

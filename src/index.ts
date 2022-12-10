@@ -16,21 +16,30 @@ import "regenerator-runtime/runtime";
 //import synonyms from "germansynonyms";
 import Tagify from "@yaireo/tagify";
 
+export interface IGlossaryData {
+  tags: ITag[];
+}
+
+export interface ITag {
+  name: string;
+  words: string[];
+}
+
 // import jargon from "@clipperhouse/jargon";
 // import stackexchange from "@clipperhouse/jargon/stackexchange"; // a dictionary
 // include wink-nlp (lemmatizing)
 const openthesaurus = require("openthesaurus");
-const glossarData = require("../data/glossar-abo.json");
+const glossaryData: IGlossaryData = require("../data/glossary_DE-abo.json");
 const configFile = require("../data/config.json");
 
 export class Taggy {
   public name: string = "taggy";
   private tagify!: Tagify;
   private tagifyOverride!: Tagify;
+  private glossaryData: IGlossaryData;
   private winkTokenizer: tokenizer;
   private stopwordsDE: any;
   private openthesaurus: any;
-
   private inputField!: HTMLInputElement;
   private outputField!: HTMLInputElement;
   private submitButton!: HTMLElement;
@@ -76,7 +85,8 @@ export class Taggy {
     options: Object
   ) {
     // console.log("TAGGY CONFIG", this.config);
-    console.log("hello, this is taggy 0.1");
+    console.log("hello, this is taggy 0.3");
+    this.glossaryData = glossaryData;
 
     this.setSubmitButton(submitButton);
     this.setInputField(inputField);
@@ -215,6 +225,7 @@ export class Taggy {
 
   setOverrideOutput(overrideOutput: HTMLInputElement) {
     this.overrideOutput = overrideOutput;
+
     this.overrideOutput.addEventListener("click", (event) => {
       this.handleOverrideOutputEventListener(event);
     });
@@ -235,8 +246,13 @@ export class Taggy {
     return this.config;
   }
 
-  getGlossar(): JSON {
-    return glossarData;
+  getGlossary(): IGlossaryData {
+    return this.glossaryData;
+  }
+
+  setGlossary(glossaryToSet: IGlossaryData) {
+    this.glossaryData = glossaryToSet;
+    console.log("set new glossary to", this.glossaryData);
   }
 
   setOption(option: string, value: boolean) {
@@ -447,11 +463,11 @@ export class Taggy {
       } else {
         // this.overrideOutput.value = topTags.join(", ");
         if (topTags.length > 1) {
-          let taggyTagOverrideTitle = document.createElement("h3");
-          taggyTagOverrideTitle.innerText =
-            "Multiple possibilities found. Click to override main tag";
-          taggyTagOverrideTitle.classList.add("override-title");
-          this.overrideOutput.prepend(taggyTagOverrideTitle);
+          // let taggyTagOverrideTitle = document.createElement("h3");
+          // taggyTagOverrideTitle.innerText =
+          //   "Multiple possibilities found. Click to override main tag";
+          // taggyTagOverrideTitle.classList.add("override-title");
+          // this.overrideOutput.parentNode?.insertBefore(taggyTagOverrideTitle, this.overrideOutput);
 
           this.overrideOutput.setAttribute("value", topTags.join(", "));
           topTags.forEach((tag) => {
@@ -572,23 +588,23 @@ export class Taggy {
 
     console.log("NORMALIZED/ENRICHED INPUTVALUES", enrichedInputValues);
 
-    let glossarTags: string[] = [];
+    let glossaryTags: string[] = [];
     let combinedWordsReturnSet: string[] = [];
 
     // if INCLUDE-TOP is set -> add top tag
-    for (const category of glossarData.tags) {
+    for (const category of this.glossaryData.tags) {
       if (this.config.include_top) {
         console.log("INCLUDE TOP IS SET");
         console.log(category);
-        glossarTags.push(normalizer(category.name));
+        glossaryTags.push(normalizer(category.name));
       }
       for (const word of category.words) {
-        glossarTags.push(normalizer(word));
+        glossaryTags.push(normalizer(word));
       }
       // check input for words with whitespaces and "-"
     }
 
-    for (const word of glossarTags) {
+    for (const word of glossaryTags) {
       if (word.includes(" ") || word.includes("-")) {
         console.log("WORD WITH WHITE OR -", word);
         if (normalizer(input).includes(word)) {
@@ -604,15 +620,15 @@ export class Taggy {
       }
     }
 
-    console.log("WORDS IN GLOSSAR", glossarTags);
+    console.log("WORDS IN GLOSSARY", glossaryTags);
     console.log("ENRICHED INPUTVALUES", enrichedInputValues);
 
     let returnValues: string[] = [];
 
-    // look for matches in glossar
-    for (const glossarValue of glossarTags) {
+    // look for matches in glossary
+    for (const glossaryValue of glossaryTags) {
       for (const inputValue of enrichedInputValues) {
-        if (inputValue == glossarValue) {
+        if (inputValue == glossaryValue) {
           console.log("MATCH FOR", inputValue);
           returnValues.push(inputValue);
         }
@@ -633,7 +649,7 @@ export class Taggy {
     if (this.config.assign_top) {
       let count = 0;
       // if INCLUDE_TOP ist set -> add top categories
-      glossarData.tags.forEach((category: any) => {
+      this.glossaryData.tags.forEach((category: any) => {
         console.log("CATEGORY", category);
         count = 0;
         finalSet.forEach((element) => {
