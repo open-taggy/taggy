@@ -440,14 +440,6 @@
         "yield",
         "zero-sum game"
       ]
-    },
-    {
-      "name": "Feedback",
-      "words": ["love", "great work", "fan"]
-    },
-    {
-      "name": "Account Information",
-      "words": ["information", "account"]
     }
   ]
 }

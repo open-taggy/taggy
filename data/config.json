@@ -9,8 +9,8 @@
   "waittime-comment": "Set time to wait for processing after keyboard input | default: 1000",
   "categories": {
     "assign-top": "true",
-    "assign-top-comment": "true -> return top tag (category) of found keyword; false -> return the keyword itself | default: true",
+    "assign-top-comment": "if set true -> return name of category for found keyword; if set false -> return the keyword itself | default: true",
     "include-top": "false",
-    "include-top-comment": "Include top tag (category) as a keyword | default: false"
+    "include-top-comment": "Include name of category as a keyword | default: false"
   }
 }
