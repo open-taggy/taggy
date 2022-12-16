@@ -43,9 +43,9 @@ export class Taggy {
   private inputField!: HTMLInputElement;
   private outputField!: HTMLInputElement;
   private submitButton!: HTMLElement;
-  private frequencyOutput: HTMLSpanElement;
+  private frequencyOutput: HTMLSpanElement | undefined;
   private overrideOutput!: HTMLInputElement;
-  private loaderElement: HTMLElement;
+  private loaderElement: HTMLElement | undefined;
   private mostFrequentWords: string[] = [];
   private mostFrequentTopTags: any[] = [];
   private timeout: any = null;
@@ -78,20 +78,20 @@ export class Taggy {
   constructor(
     inputField: HTMLInputElement,
     outputField: HTMLInputElement,
-    submitButton: HTMLElement,
-    frequencyOutput: HTMLSpanElement,
-    overrideOutput: HTMLInputElement,
-    loaderElement: HTMLElement,
-    options: Object
+    submitButton?: HTMLElement,
+    frequencyOutput?: HTMLSpanElement,
+    overrideOutput?: HTMLInputElement,
+    loaderElement?: HTMLElement,
+    options?: Object
   ) {
     // console.log("TAGGY CONFIG", this.config);
     console.log("hello, this is taggy 0.3");
     this.glossaryData = glossaryData;
 
-    this.setSubmitButton(submitButton);
+    if (submitButton) this.setSubmitButton(submitButton);
     this.setInputField(inputField);
     this.outputField = outputField;
-    this.loaderElement = loaderElement;
+    if (loaderElement) this.loaderElement = loaderElement;
     // this.submitButton = submitButton;
 
     this.winkTokenizer = new tokenizer();
@@ -101,7 +101,7 @@ export class Taggy {
     // if (this.outputField) this.outputField.setAttribute("readOnly", "true");
     if (this.config.use_tagify) this.createTagify(this.outputField);
 
-    this.frequencyOutput = frequencyOutput;
+    if (frequencyOutput) this.frequencyOutput = frequencyOutput;
 
     // this.overrideOutput = overrideOutput;
     if (overrideOutput) {
@@ -176,7 +176,7 @@ export class Taggy {
       await this.processAndAddTags(this.inputField.value, this.outputField);
 
       // this.outputField.style.backgroundColor = "#ffffff";
-      this.loaderElement.style.setProperty("display", "none");
+      this.loaderElement?.style.setProperty("display", "none");
 
       if (this.tagify) {
         this.tagify.DOM.scope.style.setProperty(
@@ -444,9 +444,10 @@ export class Taggy {
   }
 
   addFrequencyOutput() {
-    this.frequencyOutput.innerHTML =
-      "Word(s) with most Occurencies: " +
-      this.getMostFrequentWords()?.join(", ");
+    if (this.frequencyOutput)
+      this.frequencyOutput.innerHTML =
+        "Word(s) with most Occurencies: " +
+        this.getMostFrequentWords()?.join(", ");
   }
 
   addOverrideOutput() {

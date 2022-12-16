@@ -49,7 +49,7 @@ export declare class Taggy {
      * @param loaderElement Add a loading indicator (spinner) that gets hidden on completion
      * @param options Optional: Provide options for taggys behaviour
      */
-    constructor(inputField: HTMLInputElement, outputField: HTMLInputElement, submitButton: HTMLElement, frequencyOutput: HTMLSpanElement, overrideOutput: HTMLInputElement, loaderElement: HTMLElement, options: Object);
+    constructor(inputField: HTMLInputElement, outputField: HTMLInputElement, submitButton?: HTMLElement, frequencyOutput?: HTMLSpanElement, overrideOutput?: HTMLInputElement, loaderElement?: HTMLElement, options?: Object);
     resetData(): void;
     setInputField(inputField: HTMLInputElement): void;
     setSubmitButton(submitButton: HTMLElement): void;
