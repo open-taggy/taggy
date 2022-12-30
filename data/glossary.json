@@ -1,0 +1,16 @@
+{
+  "tags": [
+    {
+      "name": "First Category",
+      "words": ["tag1", "tag2", "another-tag", "and-another-tag"]
+    },
+    {
+      "name": "Second Category",
+      "words": ["First one for #2", "Second one for #2"]
+    },
+    {
+      "name": "A Third Category",
+      "words": ["sub3-1", "sub3-2"]
+    }
+  ]
+}

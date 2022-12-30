@@ -29,7 +29,7 @@ export interface ITag {
 // import stackexchange from "@clipperhouse/jargon/stackexchange"; // a dictionary
 // include wink-nlp (lemmatizing)
 const openthesaurus = require("openthesaurus");
-const glossaryData: IGlossaryData = require("../data/glossary_DE-abo.json");
+const glossaryData: IGlossaryData = require("../data/glossary.json");
 const configFile = require("../data/config.json");
 
 export class Taggy {
@@ -85,7 +85,7 @@ export class Taggy {
     options?: Object
   ) {
     // console.log("TAGGY CONFIG", this.config);
-    console.log("hello, this is taggy 0.3");
+    console.log("hello, this is taggy 0.0.1");
     this.glossaryData = glossaryData;
 
     if (submitButton) this.setSubmitButton(submitButton);

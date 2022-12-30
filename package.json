@@ -5,9 +5,7 @@
   "main": "./lib/index.js",
   "scripts": {
     "build": "tsc -w",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "npm run build",
-    "postbuild": ""
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -28,7 +26,7 @@
   "bugs": {
     "url": "https://github.com/open-taggy/taggy-base/issues"
   },
-  "homepage": "https://github.com/open-taggy/taggy-base#readme",
+  "homepage": "https://github.com/open-taggy",
   "dependencies": {
     "lodash": "^4.17.21",
     "@yaireo/tagify": "^4.16.4",

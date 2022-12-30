@@ -1,6 +1,6 @@
 {
   "use-tagify": "false",
-  "use-tagify-comment": "Use Tagify to display tags | default: true",
+  "use-tagify-comment": "Use Tagify to display tags | default: false",
   "use-submit": "true",
   "use-submit-comment": "Use submit button to process input instead of automatic behavior while typing (only works with defined submitButton) | default: false",
   "openthesaurus": "false",
