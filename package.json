@@ -1,6 +1,6 @@
 {
   "name": "@b1tsteller/taggy",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "taggy helps you to tag your content",
   "main": "./lib/index.js",
   "scripts": {
