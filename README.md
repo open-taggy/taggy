@@ -39,9 +39,8 @@ The structure is as follows:
     },
     {
       "name": "A Third Category",
-      "words": ["sub3-1", "sub3-2",
-      ]
-    },
+      "words": ["sub3-1", "sub3-2"]
+    }
   ]
 }
 
