@@ -35,11 +35,11 @@ The structure is as follows:
     },
     {
       "name": "Second Category",
-      "words": ["Tag for #2", "Second Tag for #2"]
+      "words": ["First one for #2", "Second one for #2"]
     },
     {
       "name": "A Third Category",
-      "words": ["Sub tag for the third category", "Another sub tag for the third category",
+      "words": ["sub3-1", "sub3-2",
       ]
     },
   ]
