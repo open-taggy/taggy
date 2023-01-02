@@ -12,7 +12,9 @@
     "url": "git+https://github.com/open-taggy/taggy.git"
   },
   "files": [
-    "lib/**/*"
+    "lib/**/*",
+    "data/config.json",
+    "data/glossary.json"
   ],
   "keywords": [
     "tag",
