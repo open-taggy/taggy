@@ -11,11 +11,14 @@ taggy is a frontend package to automatically tag (or categorize) textual content
 
 <img src="https://github.com/open-taggy/.github/blob/main/screencasts/screencast-shop_en_submit.gif" width="600" />
 
+
+- **[try out the live-demo here](https://open-taggy.github.io/demo/)**
+
 ---
+## Please Note
 
 This here is to get you going quickly. 
-For more information on taggy, demos and extended docs, please [go here](https://github.com/open-taggy)
-
+For more information on taggy, more demos and extended docs, please [go here](https://github.com/open-taggy).
 
 ## Getting Started
 
