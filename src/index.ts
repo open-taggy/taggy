@@ -3,6 +3,7 @@ import tokenizer from "wink-tokenizer";
 import stopwords from "stopwords-iso"; // object of stopwords for multiple languages
 // import stopwordsDE from de; // german stopwords
 import normalizer from "normalize-for-search";
+import wordcloud from "wordcloud";
 import {
   sample,
   filter,
@@ -15,6 +16,7 @@ import {
 import "regenerator-runtime/runtime";
 //import synonyms from "germansynonyms";
 import Tagify from "@yaireo/tagify";
+import WordCloud from "wordcloud";
 
 export interface IGlossaryData {
   tags: ITag[];
@@ -495,6 +497,15 @@ export class Taggy {
         }
       }
     }
+  }
+
+  public createWordCloud(htmlElement: HTMLElement): any {
+    return WordCloud(htmlElement, {
+      list: [
+        ["foo", 12],
+        ["bar", 6],
+      ],
+    });
   }
 
   getRandomTwColor(): string {

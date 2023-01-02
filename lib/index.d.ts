@@ -72,6 +72,7 @@ export declare class Taggy {
     addTags(input: string): void;
     addFrequencyOutput(): void;
     addOverrideOutput(): void;
+    createWordCloud(htmlElement: HTMLElement): any;
     getRandomTwColor(): string;
     deleteTags(): void;
     tokenize(input: string, type?: string): string[];
