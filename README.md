@@ -1,5 +1,15 @@
-# taggy | base package 🐓
+# taggy | Open Semantic Tagging
+
+<p align="center">
+  <img width="240" alt="mtl-taggy" src="https://github.com/open-taggy/website/blob/main/static/img/logo.png">
+</p>
+<p align="center">
 taggy is a frontend package to automatically tag (or categorize) textual content.
+</p>
+
+---
+
+<img src="https://github.com/open-taggy/.github/blob/main/screencasts/screencast-shop_en_submit.gif" width="600" />
 
 ---
 
