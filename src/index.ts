@@ -84,8 +84,8 @@ export class Taggy {
     loaderElement?: HTMLElement,
     options?: Object
   ) {
-    // console.log("TAGGY CONFIG", this.config);
-    console.log("hello, this is taggy 0.0.1");
+    //
+
     this.glossaryData = glossaryData;
 
     if (submitButton) this.setSubmitButton(submitButton);
@@ -108,8 +108,6 @@ export class Taggy {
       this.setOverrideOutput(overrideOutput);
       if (this.config.use_tagify) this.createTagifyOverride(overrideOutput);
     }
-
-    console.log("created a new taggy instance");
   }
 
   resetData() {
@@ -119,7 +117,7 @@ export class Taggy {
 
   setInputField(inputField: HTMLInputElement) {
     this.inputField = inputField;
-    console.log("SET INPUT FIELD");
+
     console.log(
       "USE_SUBMIT",
       this.config.use_submit,
@@ -133,29 +131,23 @@ export class Taggy {
       this.inputField.addEventListener("input", (event) => {
         this.handleInputEventListener();
       });
-      console.log("taggy", "input field and handler set", this.inputField);
     }
   }
 
   setSubmitButton(submitButton: HTMLElement) {
-    console.log("SET SUBMIT BUTTON");
     this.submitButton = submitButton;
     this.submitButton.addEventListener("click", (event) => {
-      console.log("SUBMIT BUTTON CLICKED");
       if (this.config.use_submit) {
         this.handleSubmitButtonEventListener();
       }
     });
-    console.log("taggy", "submit button and handler set", this.submitButton);
   }
 
   handleInputEventListener() {
-    console.log("INSIDE EVENT LISTENER | INPUT KEYSTROKE");
     if (this.config.use_submit) {
-      console.log("but doing nothing");
       return;
     }
-    // console.log("WAITTIME", this.config.waittime);
+    //
     // this.outputField.style.backgroundColor = "#f2f102";
     if (this.loaderElement)
       this.loaderElement.style.setProperty("display", "block");
@@ -191,10 +183,7 @@ export class Taggy {
   }
 
   async handleSubmitButtonEventListener() {
-    console.log("INSIDE EVENT LISTENER | BUTTON");
     if (this.loaderElement) {
-      console.log("EV before");
-      console.log("loaderELEMENT", this.loaderElement);
       this.loaderElement.style.setProperty("display", "block");
     }
 
@@ -203,7 +192,6 @@ export class Taggy {
     // add loading-indicator -> helpful for UX
     clearTimeout(this.timeout);
     this.timeout = setTimeout(async () => {
-      console.log("EV after");
       await this.processAndAddTags(this.inputField.value, this.outputField);
       if (this.loaderElement) {
         this.loaderElement.style.setProperty("display", "none");
@@ -216,7 +204,6 @@ export class Taggy {
     outputField.readOnly = true;
     outputField.value = "";
     this.outputField = outputField;
-    console.log("taggy", "output field set");
   }
 
   setFrequencyOutput(frequencyOutput: HTMLSpanElement) {
@@ -229,17 +216,14 @@ export class Taggy {
     this.overrideOutput.addEventListener("click", (event) => {
       this.handleOverrideOutputEventListener(event);
     });
-    console.log("taggy", "Override field and handler set", this.overrideOutput);
   }
 
   handleOverrideOutputEventListener(event: MouseEvent) {
-    console.log("INSIDE EVENT LISTENER | OVERRIDE");
     const target = event.target as HTMLElement;
 
     // prevent container above to be clickabe -> only tag-div itself
     if (event.target == event.currentTarget) return;
-    if (target) console.log(target.innerHTML);
-    this.addTags(target.innerHTML);
+    if (target) this.addTags(target.innerHTML);
   }
 
   getConfig(): Object {
@@ -252,11 +236,9 @@ export class Taggy {
 
   setGlossary(glossaryToSet: IGlossaryData) {
     this.glossaryData = glossaryToSet;
-    console.log("set new glossary to", this.glossaryData);
   }
 
   setOption(option: string, value: boolean) {
-    console.log("setting", option, "to", value);
     if (option == "use_tagify") {
       this.config.use_tagify = value;
       if (!value) {
@@ -265,12 +247,11 @@ export class Taggy {
       }
     }
     if (option == "use_submit") {
-      console.log("USE_SUBMIT OPTION", value);
       this.config.use_submit = value;
       if (value) {
         // this.handleSubmitButtonEventListener();
         this.setSubmitButton(this.submitButton);
-        console.log(this.inputField);
+
         // remove all event listeners from element
         // this.inputField.replaceWith(this.inputField.cloneNode(true));
         this.setInputField(this.inputField);
@@ -297,7 +278,6 @@ export class Taggy {
   }
 
   getMostFrequentWords() {
-    console.log("most frequent called", this.mostFrequentWords);
     return this.mostFrequentWords;
   }
 
@@ -321,7 +301,6 @@ export class Taggy {
   transformTagifyTag(tagData: Tagify.TagData) {
     let randomColor = getRandomColor();
     tagData.color = randomColor;
-    console.log("randomColor", randomColor);
 
     tagData.style =
       "--tag-bg:" + tagData.color + ";" + "--tag-border-radius: 20px";
@@ -348,7 +327,6 @@ export class Taggy {
         this.tagifyOverride.DOM.scope.style.setProperty("border", "none");
       }
       this.tagifyOverride.on("click", (e) => {
-        console.log(e.detail.data.value);
         this.addTags(e.detail.data.value);
       });
     }
@@ -358,13 +336,10 @@ export class Taggy {
     let returnSet: string[] = [];
     // get synsets from openthesaurus?
     for await (const word of inputArray) {
-      console.log("CALLING OPENTHESAURUS API");
       await this.openthesaurus.get(word).then((response: any) => {
-        console.log(response);
         let optValues: string[] = [];
         // response.baseforms?
         if (response && response.synsets[0]?.terms) {
-          console.log(response.synsets[0]?.terms);
           response.synsets[0].terms.forEach((term: any) => {
             optValues.push(normalizer(term.term));
           });
@@ -377,11 +352,11 @@ export class Taggy {
 
   // async process(input: string) {
   //   this.outputField.setAttribute("value", "");
-  //   console.log("loaderElement", this.loaderElement);
+  //
   //   this.loaderElement.style.setProperty("display", "block");
   //   let processedInput = await this.processInput(input);
   //   this.loaderElement.style.setProperty("display", "none");
-  //   console.log("processedinput", processedInput[0]);
+  //
   //   processedInput[0] = processedInput[0] ? processedInput[0] : "";
   //   this.outputField.setAttribute("value", processedInput[0]);
   //   return processedInput;
@@ -391,11 +366,9 @@ export class Taggy {
     input: string,
     outputField: HTMLInputElement
   ): Promise<boolean> {
-    console.log("awaiting processedInput");
     this.deleteTags();
     let processedInput = await this.processInput(input);
     if (processedInput) {
-      console.log("done with processedInput");
       this.addTags(processedInput[0]);
       return Promise.resolve(true);
     }
@@ -407,7 +380,6 @@ export class Taggy {
     if (this.outputField.lastChild)
       this.outputField.removeChild(this.outputField.lastChild!);
 
-    console.log("addtag", input);
     if (this.config.use_tagify) {
       if (!this.tagify) this.createTagify(this.outputField);
       if (!this.tagifyOverride) this.createTagifyOverride(this.overrideOutput!);
@@ -421,7 +393,7 @@ export class Taggy {
     } else {
       this.outputField.setAttribute("value", input);
       this.outputField.value = input;
-      console.log("field", this.outputField);
+
       const taggyTag = document.createElement("div");
       // taggyTag.classList.add("taggy-tag");
       // taggyTag.id = "taggy-tag";
@@ -486,7 +458,7 @@ export class Taggy {
           });
 
           // this.outputField.value = input;
-          // console.log("field", this.outputField);
+          //
           // const taggyTag = document.createElement("div");
           // // taggyTag.classList.add("taggy-tag");
           // taggyTag.id = "taggy-tag";
@@ -533,7 +505,6 @@ export class Taggy {
 
     // delete override tags
     while (this.overrideOutput.firstChild) {
-      console.log("REMOVE CHILD", this.overrideOutput.firstChild);
       this.overrideOutput.removeChild(this.overrideOutput.firstChild);
     }
   }
@@ -563,15 +534,12 @@ export class Taggy {
   }
 
   async processInput(input: string): Promise<string[]> {
-    console.log("called processinput");
-
     this.resetData();
 
     // tokenize,filter out german stopword and normalize input (remove umlaute and transform to lowercase)
     let tokenizedValues = this.normalize(
       this.filterStopWords(this.tokenize(input, "word"))
     );
-    console.log("tokenized and normalized values", tokenizedValues);
 
     // return if input is too small
     if (tokenizedValues.length < 2) return [];
@@ -587,16 +555,12 @@ export class Taggy {
       .flat()
       .concat(tokenizedValues.flat());
 
-    console.log("NORMALIZED/ENRICHED INPUTVALUES", enrichedInputValues);
-
     let glossaryTags: string[] = [];
     let combinedWordsReturnSet: string[] = [];
 
     // if INCLUDE-TOP is set -> add top tag
     for (const category of this.glossaryData.tags) {
       if (this.config.include_top) {
-        console.log("INCLUDE TOP IS SET");
-        console.log(category);
         glossaryTags.push(normalizer(category.name));
       }
       for (const word of category.words) {
@@ -607,22 +571,17 @@ export class Taggy {
 
     for (const word of glossaryTags) {
       if (word.includes(" ") || word.includes("-")) {
-        console.log("WORD WITH WHITE OR -", word);
         if (normalizer(input).includes(word)) {
           combinedWordsReturnSet.push(word);
-          console.log("whitespace-word match added", word);
 
           // let matchArray = normalizer(input).matchAll(word);
           // for (let match of matchArray) {
           //   combinedWordsReturnSet.push(match[0]);
-          //   console.log("whitespace-word match added", match[0]);
+          //
           // }
         }
       }
     }
-
-    console.log("WORDS IN GLOSSARY", glossaryTags);
-    console.log("ENRICHED INPUTVALUES", enrichedInputValues);
 
     let returnValues: string[] = [];
 
@@ -630,18 +589,12 @@ export class Taggy {
     for (const glossaryValue of glossaryTags) {
       for (const inputValue of enrichedInputValues) {
         if (inputValue == glossaryValue) {
-          console.log("MATCH FOR", inputValue);
           returnValues.push(inputValue);
         }
       }
     }
 
-    console.log("COMBINEDWORDSRETURNSET", combinedWordsReturnSet);
-    console.log("RETURN VALUES", returnValues);
-
     let finalSet: string[] = [...combinedWordsReturnSet!].concat(returnValues);
-
-    console.log("FINAL SET", finalSet);
 
     let topTagCount: any = [];
 
@@ -651,7 +604,6 @@ export class Taggy {
       let count = 0;
       // if INCLUDE_TOP ist set -> add top categories
       this.glossaryData.tags.forEach((category: any) => {
-        console.log("CATEGORY", category);
         count = 0;
         finalSet.forEach((element) => {
           // if INCLUDE_TOP ist set -> add top categories
@@ -669,7 +621,6 @@ export class Taggy {
         if (count > maxCount) maxCount = count;
       });
 
-      console.log("TOPCATFREQ", topTagCount);
       // console.log("SORTBY", sortBy(topTagCount, ["category", "count"]));
 
       // set most frequent top tags
@@ -683,7 +634,6 @@ export class Taggy {
     this.mostFrequentWords = modeArray(finalSet)!;
 
     let finalValue = sample(this.mostFrequentWords)!;
-    console.log("MOSTFREQUENT TOP TAGS", this.mostFrequentTopTags);
 
     // if ASSIGN_TOP is set -> return top categegory
     if (this.config.assign_top) {
@@ -691,7 +641,7 @@ export class Taggy {
       Object.values(this.mostFrequentTopTags).forEach((element) => {
         if (element.count) topTags.push(element.category);
       });
-      console.log("topTAGS", topTags);
+
       let tempValue = sample(topTags);
       if (tempValue) finalValue = tempValue;
     }
@@ -707,7 +657,6 @@ function enrichWithOpenThesaurus(inputArray: string[]) {
     // get baseforms from openthesaurus?
     openthesaurus.get(word).then((response: any) => {
       if (response && response.baseforms) {
-        console.log(response.baseforms);
         enrichedArray.push(response.baseforms);
       }
       // get baseforms from openthesaurus?

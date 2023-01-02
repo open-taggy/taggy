@@ -30,13 +30,13 @@
   },
   "homepage": "https://github.com/open-taggy",
   "dependencies": {
-    "lodash": "^4.17.21",
     "@yaireo/tagify": "^4.16.4",
+    "lodash": "^4.17.21",
+    "normalize-for-search": "^2.1.0",
     "openthesaurus": "^1.0.2",
     "regenerator-runtime": "^0.13.9",
-    "wink-tokenizer": "^5.3.0",
-    "normalize-for-search": "^2.1.0",
-    "stopwords-iso": "^1.1.0"
+    "stopwords-iso": "^1.1.0",
+    "wink-tokenizer": "^5.3.0"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.186",
