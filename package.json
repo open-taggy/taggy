@@ -1,7 +1,7 @@
 {
   "name": "@b1tsteller/taggy",
   "version": "0.0.2",
-  "description": "taggy helps you to tag your content",
+  "description": "taggy helps you tag your content",
   "main": "./lib/index.js",
   "scripts": {
     "build": "tsc -w",
@@ -15,9 +15,11 @@
     "lib/**/*"
   ],
   "keywords": [
+    "tag",
     "tags",
     "tagging",
-    "tag",
+    "categories",
+    "categorization",
     "input",
     "text"
   ],
