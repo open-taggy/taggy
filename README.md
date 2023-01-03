@@ -22,11 +22,11 @@ For more information on taggy, more demos and extended docs, please [go here](ht
 
 ## Getting Started
 
-1. Install taggy with npm:
+**1. Install taggy with npm:**
 
 `npm install @b1tsteller/taggy`
 
-2. Import the package and create a new instance with at least an input and an output-element:
+**2. Import the package and create a new instance with at least an input and an output-element:**
 ```node
 import { Taggy } from "@b1tsteller/taggy-test2";
 
@@ -34,25 +34,36 @@ let taggy = new Taggy(inputElement, outputElement);
 ```
 - The input-element is a html-tag, preferably `<input>` or `<textarea>`, but can be everything holding text
 
-- The output-elment can be a html-tag of any kind, preferably `<div>`
+- The output-element can be a html-tag of any kind, preferably `<div>`
 
-3. Get your glossary ready and adjust it to your needs. Per default you can find it under `/data/glossary.json`. 
+**3. Get your glossary ready and adjust it to your needs.**
+
+The default comes integrated under `/data/glossary.json` with the data shown below.
+But you definetly want to use your own :)
+
+You can set it like this:
+
+```node
+import myGlossary from "../data/my-glossary.json";
+
+taggy.setGlossary(myGlossary);
+```
 
 The structure is as follows:
 ```json
 {
   "tags": [
     {
-      "name": "First Category",
-      "words": ["tag1", "tag2", "another-tag", "and-another-tag"]
+      "name": "Herbs and Spices",
+      "words": ["Rosemary", "Parsley", "Pepper", "Thyme", "Mint", "Chilli", "Basil", "Dill"]
     },
     {
-      "name": "Second Category",
-      "words": ["First one for #2", "Second one for #2"]
+        "name": "Vegetables",
+        "words": ["Potatoes", "Cucumber", "Garlic", "Carrots", "Spinach", "Onion", "Mushrooms"]
     },
     {
-      "name": "A Third Category",
-      "words": ["sub3-1", "sub3-2"]
+      "name": "Fish",
+      "words": ["Salmon", "Tuna", "Red Snapper", "Sardines", "Herring", "Flounder", "Bass", "Mackerel"]
     }
   ]
 }
