@@ -1,16 +1,16 @@
 {
   "tags": [
     {
-      "name": "First Category",
-      "words": ["tag1", "tag2", "another-tag", "and-another-tag"]
+      "name": "Herbs and Spices",
+      "words": ["Rosemary", "Parsley", "Pepper", "Thyme", "Mint", "Chilli", "Basil", "Dill"]
     },
     {
-      "name": "Second Category",
-      "words": ["First one for #2", "Second one for #2"]
+        "name": "Vegetables",
+        "words": ["Potatoes", "Cucumber", "Garlic", "Carrots", "Spinach", "Onion", "Mushrooms"]
     },
     {
-      "name": "A Third Category",
-      "words": ["sub3-1", "sub3-2"]
+      "name": "Fish",
+      "words": ["Salmon", "Tuna", "Red Snapper", "Sardines", "Herring", "Flounder", "Bass", "Mackerel"]
     }
   ]
 }
