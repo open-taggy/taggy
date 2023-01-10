@@ -28,7 +28,10 @@ For more information on taggy, more demos and extended docs, please [go here](ht
 
 **2. Import the package and create a new instance with at least an input and an output-element:**
 ```node
-import { Taggy } from "@b1tsteller/taggy-test2";
+import { Taggy } from "@b1tsteller/taggy";
+
+let inputElement = document.getElementById('inputField');
+let outputElement = document.getElementById("outputDiv");
 
 let taggy = new Taggy(inputElement, outputElement);
 ```
