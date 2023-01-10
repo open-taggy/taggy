@@ -1,7 +1,7 @@
 {
   "use-tagify": "false",
   "use-tagify-comment": "Use Tagify to display tags | default: false",
-  "use-submit": "true",
+  "use-submit": "false",
   "use-submit-comment": "Use submit button to process input instead of automatic behavior while typing (only works with defined submitButton) | default: false",
   "openthesaurus": "false",
   "openthesaurus-comment": "Add call to openthesaurus API to enrich words (experimental) | default: false",
@@ -11,6 +11,6 @@
     "assign-top": "true",
     "assign-top-comment": "if set true -> return name of category for found keyword; if set false -> return the keyword itself | default: true",
     "include-top": "false",
-    "include-top-comment": "Include name of category as a keyword | default: false"
+    "include-top-comment": "Include name of the categories itself as keywords | default: false"
   }
 }

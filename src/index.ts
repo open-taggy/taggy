@@ -89,7 +89,9 @@ export class Taggy {
     this.glossaryData = glossaryData;
 
     if (submitButton) this.setSubmitButton(submitButton);
+    if (!inputField) throw new Error("No input-element provided for taggy");
     this.setInputField(inputField);
+    if (!outputField) throw new Error("No output-element provided for taggy");
     this.outputField = outputField;
     if (loaderElement) this.loaderElement = loaderElement;
     // this.submitButton = submitButton;
@@ -504,8 +506,10 @@ export class Taggy {
       this.outputField.removeChild(this.outputField.lastChild!);
 
     // delete override tags
-    while (this.overrideOutput.firstChild) {
-      this.overrideOutput.removeChild(this.overrideOutput.firstChild);
+    if (this.overrideOutput) {
+      while (this.overrideOutput.firstChild) {
+        this.overrideOutput.removeChild(this.overrideOutput.firstChild);
+      }
     }
   }
 
@@ -542,7 +546,7 @@ export class Taggy {
     );
 
     // return if input is too small
-    if (tokenizedValues.length < 2) return [];
+    if (tokenizedValues.length < 1) return [];
 
     let enrichedInputValues: string[] = [];
 
