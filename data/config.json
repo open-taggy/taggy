@@ -2,15 +2,15 @@
   "use-tagify": "false",
   "use-tagify-comment": "Use Tagify to display tags | default: false",
   "use-submit": "false",
-  "use-submit-comment": "Use submit button to process input instead of automatic behavior while typing (only works with defined submitButton) | default: false",
-  "openthesaurus": "false",
-  "openthesaurus-comment": "Add call to openthesaurus API to enrich words (experimental) | default: false",
+  "use-submit-comment": "true -> analyze input while typing / false -> use of submit button to process ('submitButton' has to be defined) | default: false",
   "waittime": 1000,
   "waittime-comment": "Set time to wait for processing after keyboard input | default: 1000",
   "categories": {
     "assign-top": "true",
-    "assign-top-comment": "if set true -> return name of category for found keyword; if set false -> return the keyword itself | default: true",
+    "assign-top-comment": "true -> return category of found keyword / false -> return the keyword itself | default: true",
     "include-top": "false",
-    "include-top-comment": "Include name of the categories itself as keywords | default: false"
-  }
+    "include-top-comment": "Include name of the categories themself as keywords | default: false"
+  },
+  "openthesaurus": "false",
+  "openthesaurus-comment": "Add call to openthesaurus API to enrich words (experimental) | default: false"
 }

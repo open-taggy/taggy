@@ -1,16 +1,16 @@
 {
   "tags": [
     {
-      "name": "Print-Abo",
-      "words": ["printausgabe", "gedruckt", "postkasten", "zeitung"]
+      "category": "Print-Abo",
+      "keywords": ["printausgabe", "gedruckt", "postkasten", "zeitung"]
     },
     {
-      "name": "Online-Abo",
-      "words": ["website", "kommentarfunktion", "forum"]
+      "category": "Online-Abo",
+      "keywords": ["website", "kommentarfunktion", "forum"]
     },
     {
-      "name": "ePaper-Abo",
-      "words": [
+      "category": "ePaper-Abo",
+      "keywords": [
         "eReader",
         "kindle",
         "tolino",
@@ -21,8 +21,8 @@
       ]
     },
     {
-      "name": "Nachsendeauftrag",
-      "words": [
+      "category": "Nachsendeauftrag",
+      "keywords": [
         "nachsendung",
         "urlaub",
         "umzug",
@@ -33,8 +33,8 @@
       ]
     },
     {
-      "name": "Reklamation",
-      "words": [
+      "category": "Reklamation",
+      "keywords": [
         "beschwerde",
         "beschweren",
         "ärgerlich",

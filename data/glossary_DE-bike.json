@@ -1,20 +1,20 @@
 {
   "tags": [
     {
-      "name": "Mountainbike",
-      "words": ["biken", "berge", "felsen", "fully", "mtb"]
+      "category": "Mountainbike",
+      "keywords": ["biken", "berge", "felsen", "fully", "mtb"]
     },
     {
-      "name": "Rennrad",
-      "words": ["straße", "dura ace", "tour de france"]
+      "category": "Rennrad",
+      "keywords": ["straße", "dura ace", "tour de france"]
     },
     {
-      "name": "Trekking/Reise",
-      "words": ["trekking", "reise", "langstrecke", "gepäcktasche"]
+      "category": "Trekking/Reise",
+      "keywords": ["trekking", "reise", "langstrecke", "gepäcktasche"]
     },
     {
-      "name": "Urban",
-      "words": ["pendeln", "fixed gear", "pegs"]
+      "category": "Urban",
+      "keywords": ["pendeln", "fixed gear", "pegs"]
     }
   ]
 }

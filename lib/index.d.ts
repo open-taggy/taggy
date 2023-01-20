@@ -5,8 +5,8 @@ export interface IGlossaryData {
     tags: ITag[];
 }
 export interface ITag {
-    name: string;
-    words: string[];
+    category: string;
+    keywords: string[];
 }
 export declare class Taggy {
     name: string;
@@ -32,12 +32,12 @@ export declare class Taggy {
         use_submit_comment: any;
         waittime: any;
         waittime_comment: any;
-        opt_enabled: boolean;
-        opt_enabled_comment: any;
         assign_top: boolean;
         assign_top_comment: any;
         include_top: boolean;
         include_top_comment: any;
+        opt_enabled: boolean;
+        opt_enabled_comment: any;
     };
     /**
      * Create a new instance of taggy

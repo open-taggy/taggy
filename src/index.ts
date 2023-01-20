@@ -21,8 +21,8 @@ export interface IGlossaryData {
 }
 
 export interface ITag {
-  name: string;
-  words: string[];
+  category: string;
+  keywords: string[];
 }
 
 // import jargon from "@clipperhouse/jargon";
@@ -31,6 +31,19 @@ export interface ITag {
 const openthesaurus = require("openthesaurus");
 const glossaryData: IGlossaryData = require("../data/glossary.json");
 const configFile = require("../data/config.json");
+
+// TODO -> IMPLEMENT CONFIG AS OBJECT AND REMOVE FILE
+
+// const config = {
+//   "use-tagify": "false",
+//   "use-submit": "false",
+//   openthesaurus: "false",
+//   waittime: 1000,
+//   categories: {
+//     "assign-top": "true",
+//     "include-top": "false",
+//   },
+// };
 
 export class Taggy {
   public name: string = "taggy";
@@ -57,12 +70,12 @@ export class Taggy {
     use_submit_comment: configFile["use-submit-comment"],
     waittime: configFile["waittime"],
     waittime_comment: configFile["waittime-comment"],
-    opt_enabled: configFile["openthesaurus"] === "true",
-    opt_enabled_comment: configFile["openthesaurus-comment"],
     assign_top: configFile.categories["assign-top"] === "true",
     assign_top_comment: configFile.categories["assign-top-comment"],
     include_top: configFile.categories["include-top"] === "true",
     include_top_comment: configFile.categories["include-top-comment"],
+    opt_enabled: configFile["openthesaurus"] === "true",
+    opt_enabled_comment: configFile["openthesaurus-comment"],
   };
 
   /**
@@ -84,7 +97,8 @@ export class Taggy {
     loaderElement?: HTMLElement,
     options?: Object
   ) {
-    //
+    // TODO -> IF CONFIG GETS PASSED TO CONSTRUCTOR MERGE IT WITH EXISTING CONFIG OBJECT
+    //const mergeConfig = {...config, ...options};
 
     this.glossaryData = glossaryData;
 
@@ -120,12 +134,12 @@ export class Taggy {
   setInputField(inputField: HTMLInputElement) {
     this.inputField = inputField;
 
-    console.log(
-      "USE_SUBMIT",
-      this.config.use_submit,
-      "BUTTON",
-      this.submitButton
-    );
+    // console.log(
+    //   "USE_SUBMIT",
+    //   this.config.use_submit,
+    //   "BUTTON",
+    //   this.submitButton
+    // );
     if (this.config.use_submit && this.submitButton) {
       return;
       // fall back to eventlistener when no submitbutton specified
@@ -402,7 +416,7 @@ export class Taggy {
       taggyTag.classList.add("taggy-tag");
       if (!input || input == "") {
         input = "No matching tag found";
-        taggyTag.classList.add("not-found");
+        taggyTag.classList.add("tag-not-found");
       } else {
         // }
         // set override tags
@@ -420,8 +434,7 @@ export class Taggy {
   addFrequencyOutput() {
     if (this.frequencyOutput)
       this.frequencyOutput.innerHTML =
-        "Word(s) with most Occurencies: " +
-        this.getMostFrequentWords()?.join(", ");
+        "Identified keywords: " + this.getMostFrequentWords()?.join(", ");
   }
 
   addOverrideOutput() {
@@ -565,9 +578,9 @@ export class Taggy {
     // if INCLUDE-TOP is set -> add top tag
     for (const category of this.glossaryData.tags) {
       if (this.config.include_top) {
-        glossaryTags.push(normalizer(category.name));
+        glossaryTags.push(normalizer(category.category));
       }
-      for (const word of category.words) {
+      for (const word of category.keywords) {
         glossaryTags.push(normalizer(word));
       }
       // check input for words with whitespaces and "-"
@@ -611,15 +624,15 @@ export class Taggy {
         count = 0;
         finalSet.forEach((element) => {
           // if INCLUDE_TOP ist set -> add top categories
-          if (normalizer(category.name) == element) {
+          if (normalizer(category.category) == element) {
             count += 1;
           }
-          if (this.normalize(category.words).includes(element)) {
+          if (this.normalize(category.keywords).includes(element)) {
             count += 1;
           }
         });
         topTagCount.push({
-          category: category.name,
+          category: category.category,
           count: count,
         });
         if (count > maxCount) maxCount = count;

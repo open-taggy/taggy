@@ -1,16 +1,16 @@
 {
   "tags": [
     {
-      "name": "Returnment",
-      "words": ["return", "shipment", "reposit"]
+      "category": "Returnment",
+      "keywords": ["return", "shipment", "reposit"]
     },
     {
-      "name": "Feedback",
-      "words": ["love", "great work", "fan"]
+      "category": "Feedback",
+      "keywords": ["love", "great work", "fan"]
     },
     {
-      "name": "Account Information",
-      "words": ["information", "account"]
+      "category": "Account Information",
+      "keywords": ["information", "account"]
     }
   ]
 }

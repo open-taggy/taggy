@@ -1,8 +1,8 @@
 {
   "tags": [
     {
-      "name": "Energy Production and Transmission",
-      "words": [
+      "category": "Energy Production and Transmission",
+      "keywords": [
         "abatement options",
         "abatement plans",
         "abrasion resistance",
@@ -6155,8 +6155,8 @@
       ]
     },
     {
-      "name": "Electric Power",
-      "words": [
+      "category": "Electric Power",
+      "keywords": [
         "acoustoelectric device",
         "benefits of electrification",
         "biogas generated electricity",
@@ -6596,8 +6596,8 @@
       ]
     },
     {
-      "name": "Hydro Power",
-      "words": [
+      "category": "Hydro Power",
+      "keywords": [
         "access by maintenance vessel",
         "actual hydro output",
         "actual sediment transport assessment",
@@ -7393,8 +7393,8 @@
       ]
     },
     {
-      "name": "Oil, Gas and Coal Energy",
-      "words": [
+      "category": "Oil, Gas and Coal Energy",
+      "keywords": [
         "absence of gas production",
         "absence of transmission infrastructures",
         "absolute barrel prices",
@@ -8443,8 +8443,8 @@
       ]
     },
     {
-      "name": "Energy Conservation and Efficiency",
-      "words": [
+      "category": "Energy Conservation and Efficiency",
+      "keywords": [
         "abatement functions",
         "abatement",
         "Abatement strategies",
@@ -11996,8 +11996,8 @@
         "Oil at sea",
         "oil at seas",
         "oil belt",
-        "Oil by name",
-        "oil by names",
+        "Oil by category",
+        "oil by categorys",
         "oil capacities",
         "oil capacity",
         "oil cargoes",
@@ -13046,8 +13046,8 @@
       ]
     },
     {
-      "name": "Rural Energy",
-      "words": [
+      "category": "Rural Energy",
+      "keywords": [
         "absolute terms",
         "acceptable transaction value",
         "accession procedures",
@@ -15060,7 +15060,7 @@
         "trade issue",
         "trademark counterfeiting",
         "trade mark",
-        "trade name",
+        "trade category",
         "trade objectives",
         "trade policy instrument",
         "trade policy review",
@@ -15165,8 +15165,8 @@
       ]
     },
     {
-      "name": "Nuclear Energy",
-      "words": [
+      "category": "Nuclear Energy",
+      "keywords": [
         "antinuclear power movement",
         "Atomic bomb",
         "atomic emission spectrometer",
@@ -15290,8 +15290,8 @@
       ]
     },
     {
-      "name": "Solar Energy",
-      "words": [
+      "category": "Solar Energy",
+      "keywords": [
         "absorber plates",
         "absorber surfaces",
         "absorbing elements",
@@ -15796,8 +15796,8 @@
       ]
     },
     {
-      "name": "Wind Energy",
-      "words": [
+      "category": "Wind Energy",
+      "keywords": [
         "aerodynamic control",
         "aerodynamic improvement device",
         "aerodynamics of wind turbine",
@@ -15872,7 +15872,7 @@
         "mechanical air spoiler",
         "motor",
         "mountain wind",
-        "nameplate power",
+        "categoryplate power",
         "nonmechanical anemometer",
         "offshore wind energies",
         "offshore wind",
@@ -16021,8 +16021,8 @@
       ]
     },
     {
-      "name": "Renewable Energy",
-      "words": [
+      "category": "Renewable Energy",
+      "keywords": [
         "acceleration of reforestation",
         "acceptable price",
         "Access to energy",
