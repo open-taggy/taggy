@@ -4,7 +4,7 @@
   <img width="240" alt="mtl-taggy" src="https://github.com/open-taggy/website/blob/main/static/img/logo.png">
 </p>
 <p align="center">
-taggy is a frontend package to automatically tag (or categorize) textual content.
+taggy is a typescript-based frontend package to automatically tag (or categorize) textual content.
 </p>
 
 ---
@@ -22,11 +22,16 @@ For more information on taggy, more demos and extended docs, please [go here](ht
 
 ## Getting Started
 
-**1. Install taggy with npm:**
+**Import it via CDN:**
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/@b1tsteller/taggy"></script>
+```
+**Or install taggy with npm:**
 
 `npm install @b1tsteller/taggy`
 
-**2. Import the package and create a new instance with at least an input and an output-element:**
+**Then import the package and create a new instance with at least an input and an output-element:**
 ```node
 import { Taggy } from "@b1tsteller/taggy";
 
@@ -39,7 +44,7 @@ let taggy = new Taggy(inputElement, outputElement);
 
 - The output-element can be a html-tag of any kind, preferably `<div>`
 
-**3. Get your glossary ready and adjust it to your needs.**
+**Get your glossary ready and adjust it to your needs.**
 
 The default comes integrated under `/data/glossary.json` with the data shown below.
 But you definetly want to use your own :)
