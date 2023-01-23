@@ -25,19 +25,14 @@ export declare class Taggy {
     private mostFrequentWords;
     private mostFrequentTopTags;
     private timeout;
-    config: {
+    options: {
         use_tagify: boolean;
-        use_tagify_comment: any;
         use_submit: boolean;
-        use_submit_comment: any;
-        waittime: any;
-        waittime_comment: any;
+        waittime: number;
         assign_top: boolean;
-        assign_top_comment: any;
         include_top: boolean;
-        include_top_comment: any;
-        opt_enabled: boolean;
-        opt_enabled_comment: any;
+        message_not_found: string;
+        openthesaurus: boolean;
     };
     /**
      * Create a new instance of taggy
@@ -59,7 +54,7 @@ export declare class Taggy {
     setFrequencyOutput(frequencyOutput: HTMLSpanElement): void;
     setOverrideOutput(overrideOutput: HTMLInputElement): void;
     handleOverrideOutputEventListener(event: MouseEvent): void;
-    getConfig(): Object;
+    getOptions(): Object;
     getGlossary(): IGlossaryData;
     setGlossary(glossaryToSet: IGlossaryData): void;
     setOption(option: string, value: boolean): void;

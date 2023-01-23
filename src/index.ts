@@ -30,20 +30,6 @@ export interface ITag {
 // include wink-nlp (lemmatizing)
 const openthesaurus = require("openthesaurus");
 const glossaryData: IGlossaryData = require("../data/glossary.json");
-const configFile = require("../data/config.json");
-
-// TODO -> IMPLEMENT CONFIG AS OBJECT AND REMOVE FILE
-
-// const config = {
-//   "use-tagify": "false",
-//   "use-submit": "false",
-//   openthesaurus: "false",
-//   waittime: 1000,
-//   categories: {
-//     "assign-top": "true",
-//     "include-top": "false",
-//   },
-// };
 
 export class Taggy {
   public name: string = "taggy";
@@ -63,19 +49,14 @@ export class Taggy {
   private mostFrequentTopTags: any[] = [];
   private timeout: any = null;
 
-  public config = {
-    use_tagify: configFile["use-tagify"] === "true",
-    use_tagify_comment: configFile["use-tagify-comment"],
-    use_submit: configFile["use-submit"] === "true",
-    use_submit_comment: configFile["use-submit-comment"],
-    waittime: configFile["waittime"],
-    waittime_comment: configFile["waittime-comment"],
-    assign_top: configFile.categories["assign-top"] === "true",
-    assign_top_comment: configFile.categories["assign-top-comment"],
-    include_top: configFile.categories["include-top"] === "true",
-    include_top_comment: configFile.categories["include-top-comment"],
-    opt_enabled: configFile["openthesaurus"] === "true",
-    opt_enabled_comment: configFile["openthesaurus-comment"],
+  options = {
+    use_tagify: false,
+    use_submit: false,
+    waittime: 1000,
+    assign_top: true,
+    include_top: false,
+    message_not_found: "No matching tag found",
+    openthesaurus: false,
   };
 
   /**
@@ -97,8 +78,8 @@ export class Taggy {
     loaderElement?: HTMLElement,
     options?: Object
   ) {
-    // TODO -> IF CONFIG GETS PASSED TO CONSTRUCTOR MERGE IT WITH EXISTING CONFIG OBJECT
-    //const mergeConfig = {...config, ...options};
+    // TODO -> IF OPTIONS GETS PASSED TO CONSTRUCTOR MERGE IT WITH EXISTING OPTIONS OBJECT
+    this.options = { ...this.options, ...options };
 
     this.glossaryData = glossaryData;
 
@@ -115,14 +96,14 @@ export class Taggy {
     this.openthesaurus = openthesaurus;
 
     // if (this.outputField) this.outputField.setAttribute("readOnly", "true");
-    if (this.config.use_tagify) this.createTagify(this.outputField);
+    if (this.options.use_tagify) this.createTagify(this.outputField);
 
     if (frequencyOutput) this.frequencyOutput = frequencyOutput;
 
     // this.overrideOutput = overrideOutput;
     if (overrideOutput) {
       this.setOverrideOutput(overrideOutput);
-      if (this.config.use_tagify) this.createTagifyOverride(overrideOutput);
+      if (this.options.use_tagify) this.createTagifyOverride(overrideOutput);
     }
   }
 
@@ -133,14 +114,7 @@ export class Taggy {
 
   setInputField(inputField: HTMLInputElement) {
     this.inputField = inputField;
-
-    // console.log(
-    //   "USE_SUBMIT",
-    //   this.config.use_submit,
-    //   "BUTTON",
-    //   this.submitButton
-    // );
-    if (this.config.use_submit && this.submitButton) {
+    if (this.options.use_submit && this.submitButton) {
       return;
       // fall back to eventlistener when no submitbutton specified
     } else {
@@ -153,14 +127,14 @@ export class Taggy {
   setSubmitButton(submitButton: HTMLElement) {
     this.submitButton = submitButton;
     this.submitButton.addEventListener("click", (event) => {
-      if (this.config.use_submit) {
+      if (this.options.use_submit) {
         this.handleSubmitButtonEventListener();
       }
     });
   }
 
   handleInputEventListener() {
-    if (this.config.use_submit) {
+    if (this.options.use_submit) {
       return;
     }
     //
@@ -195,7 +169,7 @@ export class Taggy {
       }
 
       // this.addTags(result);
-    }, this.config.waittime);
+    }, this.options.waittime);
   }
 
   async handleSubmitButtonEventListener() {
@@ -212,7 +186,7 @@ export class Taggy {
       if (this.loaderElement) {
         this.loaderElement.style.setProperty("display", "none");
       }
-    }, this.config.waittime);
+    }, this.options.waittime);
   }
 
   setOutputField(outputField: HTMLInputElement) {
@@ -242,8 +216,8 @@ export class Taggy {
     if (target) this.addTags(target.innerHTML);
   }
 
-  getConfig(): Object {
-    return this.config;
+  getOptions(): Object {
+    return this.options;
   }
 
   getGlossary(): IGlossaryData {
@@ -256,14 +230,14 @@ export class Taggy {
 
   setOption(option: string, value: boolean) {
     if (option == "use_tagify") {
-      this.config.use_tagify = value;
+      this.options.use_tagify = value;
       if (!value) {
         this.tagify.destroy();
         this.tagifyOverride.destroy();
       }
     }
     if (option == "use_submit") {
-      this.config.use_submit = value;
+      this.options.use_submit = value;
       if (value) {
         // this.handleSubmitButtonEventListener();
         this.setSubmitButton(this.submitButton);
@@ -283,13 +257,13 @@ export class Taggy {
       }
     }
     if (option == "assign_top") {
-      this.config.assign_top = value;
+      this.options.assign_top = value;
     }
-    if (option == "opt_enabled") {
-      this.config.opt_enabled = value;
+    if (option == "openthesaurus") {
+      this.options.openthesaurus = value;
     }
     if (option == "include_top") {
-      this.config.include_top = value;
+      this.options.include_top = value;
     }
   }
 
@@ -298,7 +272,7 @@ export class Taggy {
   }
 
   createTagify(inputElement: HTMLInputElement) {
-    if (this.config.use_tagify && !this.tagify) {
+    if (this.options.use_tagify && !this.tagify) {
       this.tagify = new Tagify(inputElement, {
         userInput: false,
         editTags: false,
@@ -334,7 +308,7 @@ export class Taggy {
   }
 
   createTagifyOverride(inputElement: HTMLInputElement) {
-    if (this.config.use_tagify) {
+    if (this.options.use_tagify) {
       if (!this.tagifyOverride) {
         this.tagifyOverride = new Tagify(this.overrideOutput!, {
           userInput: false,
@@ -396,7 +370,7 @@ export class Taggy {
     if (this.outputField.lastChild)
       this.outputField.removeChild(this.outputField.lastChild!);
 
-    if (this.config.use_tagify) {
+    if (this.options.use_tagify) {
       if (!this.tagify) this.createTagify(this.outputField);
       if (!this.tagifyOverride) this.createTagifyOverride(this.overrideOutput!);
       this.tagify.removeAllTags();
@@ -404,7 +378,7 @@ export class Taggy {
     }
     // if (input && input != "") {
     // set main tag for tagify
-    if (this.config.use_tagify) {
+    if (this.options.use_tagify) {
       this.tagify.addTags(input);
     } else {
       this.outputField.setAttribute("value", input);
@@ -415,7 +389,7 @@ export class Taggy {
       // taggyTag.id = "taggy-tag";
       taggyTag.classList.add("taggy-tag");
       if (!input || input == "") {
-        input = "No matching tag found";
+        input = this.options.message_not_found;
         taggyTag.classList.add("tag-not-found");
       } else {
         // }
@@ -444,7 +418,7 @@ export class Taggy {
       topTags.push(element.category)
     );
     if (this.overrideOutput) {
-      if (this.config.use_tagify && this.tagifyOverride) {
+      if (this.options.use_tagify && this.tagifyOverride) {
         // this.overrideOutput.innerHTML =
         //   "Top detected categories: " + topTags.join(", ");
         this.tagifyOverride.addTags(topTags);
@@ -564,7 +538,7 @@ export class Taggy {
     let enrichedInputValues: string[] = [];
 
     // don't call openthesaurus-API too often (-> results in too many requests error)
-    if (this.config.opt_enabled && tokenizedValues.length < 20) {
+    if (this.options.openthesaurus && tokenizedValues.length < 20) {
       enrichedInputValues = await this.callOpenThesaurusAPI(tokenizedValues);
     }
     // flat out arrays
@@ -577,7 +551,7 @@ export class Taggy {
 
     // if INCLUDE-TOP is set -> add top tag
     for (const category of this.glossaryData.tags) {
-      if (this.config.include_top) {
+      if (this.options.include_top) {
         glossaryTags.push(normalizer(category.category));
       }
       for (const word of category.keywords) {
@@ -617,7 +591,7 @@ export class Taggy {
 
     let maxCount = 0;
     // if ASSIGN_TOP is set -> return top categegory
-    if (this.config.assign_top) {
+    if (this.options.assign_top) {
       let count = 0;
       // if INCLUDE_TOP ist set -> add top categories
       this.glossaryData.tags.forEach((category: any) => {
@@ -653,7 +627,7 @@ export class Taggy {
     let finalValue = sample(this.mostFrequentWords)!;
 
     // if ASSIGN_TOP is set -> return top categegory
-    if (this.config.assign_top) {
+    if (this.options.assign_top) {
       let topTags: string[] = [];
       Object.values(this.mostFrequentTopTags).forEach((element) => {
         if (element.count) topTags.push(element.category);
