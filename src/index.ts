@@ -1,17 +1,8 @@
-import * as readline from "readline";
 import tokenizer from "wink-tokenizer";
 import stopwords from "stopwords-iso"; // object of stopwords for multiple languages
 // import stopwordsDE from de; // german stopwords
 import normalizer from "normalize-for-search";
-import {
-  sample,
-  filter,
-  max,
-  groupBy,
-  sortBy,
-  transform,
-  random,
-} from "lodash";
+import { sample, groupBy } from "lodash";
 import "regenerator-runtime/runtime";
 //import synonyms from "germansynonyms";
 import Tagify from "@yaireo/tagify";
@@ -49,7 +40,7 @@ export class Taggy {
   private mostFrequentTopTags: any[] = [];
   private timeout: any = null;
 
-  options = {
+  public options = {
     use_tagify: false,
     use_submit: false,
     waittime: 1000,
@@ -383,6 +374,11 @@ export class Taggy {
     } else {
       this.outputField.setAttribute("value", input);
       this.outputField.value = input;
+
+      if (this.options.message_not_found == "" && (!input || input == "")) {
+        console.log("RETURNIN");
+        return;
+      }
 
       const taggyTag = document.createElement("div");
       // taggyTag.classList.add("taggy-tag");
