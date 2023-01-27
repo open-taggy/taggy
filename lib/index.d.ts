@@ -1,6 +1,4 @@
-/// <reference types="yaireo__tagify" />
 import "regenerator-runtime/runtime";
-import Tagify from "@yaireo/tagify";
 export interface IGlossaryData {
     tags: ITag[];
 }
@@ -10,8 +8,6 @@ export interface ITag {
 }
 export declare class Taggy {
     name: string;
-    private tagify;
-    private tagifyOverride;
     private glossaryData;
     private winkTokenizer;
     private stopwordsDE;
@@ -26,7 +22,6 @@ export declare class Taggy {
     private mostFrequentTopTags;
     private timeout;
     options: {
-        use_tagify: boolean;
         use_submit: boolean;
         waittime: number;
         assign_top: boolean;
@@ -59,15 +54,11 @@ export declare class Taggy {
     setGlossary(glossaryToSet: IGlossaryData): void;
     setOption(option: string, value: boolean): void;
     getMostFrequentWords(): string[];
-    createTagify(inputElement: HTMLInputElement): Tagify<Tagify.TagData>;
-    transformTagifyTag(tagData: Tagify.TagData): void;
-    createTagifyOverride(inputElement: HTMLInputElement): void;
     callOpenThesaurusAPI(inputArray: string[]): Promise<string[]>;
     processAndAddTags(input: string, outputField: HTMLInputElement): Promise<boolean>;
     addTags(input: string): void;
     addFrequencyOutput(): void;
     addOverrideOutput(): void;
-    getRandomTwColor(): string;
     deleteTags(): void;
     tokenize(input: string, type?: string): string[];
     normalize(inputArray: string[]): string[];
