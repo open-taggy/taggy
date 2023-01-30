@@ -13,7 +13,6 @@
   },
   "files": [
     "lib/**/*",
-    "data/config.json",
     "data/glossary.json"
   ],
   "keywords": [
@@ -33,7 +32,6 @@
   },
   "homepage": "https://github.com/open-taggy",
   "dependencies": {
-    "@yaireo/tagify": "^4.16.4",
     "lodash": "^4.17.21",
     "normalize-for-search": "^2.1.0",
     "openthesaurus": "^1.0.2",
@@ -46,7 +44,6 @@
     "@types/node": "^18.7.18",
     "@types/normalize-for-search": "^2.1.0",
     "@types/wink-tokenizer": "^4.0.3",
-    "@types/yaireo__tagify": "^4.16.0",
     "webpack-cli": "^5.0.0"
   }
 }

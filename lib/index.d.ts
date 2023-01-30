@@ -33,11 +33,11 @@ export declare class Taggy {
      * Create a new instance of taggy
      * @param inputField Input field where user text goes
      * @param outputField Output field where the tags will show up
-     * @param submitButton Submit button to trigger processing instead of automatic behavior while typing
-     * @param frequencyOutput Show frequency of identified tags
-     * @param overrideOutput Show identified top tags with possibility to override default detection
-     * @param loaderElement Add a loading indicator (spinner) that gets hidden on completion
-     * @param options Optional: Provide options for taggys behaviour
+     * @param submitButton Optional: Submit button to trigger processing instead of automatic behavior while typing
+     * @param frequencyOutput Optional: Show frequency of identified tags
+     * @param overrideOutput Optional: Show identified top tags with possibility to override default detection
+     * @param loaderElement Optional: Add a loading indicator (spinner) that gets hidden on completion
+     * @param options Optional: Provide options for taggy's behaviour
      */
     constructor(inputField: HTMLInputElement, outputField: HTMLInputElement, submitButton?: HTMLElement, frequencyOutput?: HTMLSpanElement, overrideOutput?: HTMLInputElement, loaderElement?: HTMLElement, options?: Object);
     resetData(): void;
