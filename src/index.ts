@@ -15,6 +15,19 @@ export interface ITag {
   keywords: string[];
 }
 
+export interface IOptions {
+  submitButton: HTMLElement | undefined;
+  frequencyOutput: HTMLSpanElement | undefined;
+  overrideOutput: HTMLInputElement | undefined;
+  loaderElement: HTMLElement | undefined;
+  use_submit: boolean;
+  waittime: number;
+  assign_top: boolean;
+  include_top: boolean;
+  message_not_found: string;
+  openthesaurus: boolean;
+}
+
 // import jargon from "@clipperhouse/jargon";
 // import stackexchange from "@clipperhouse/jargon/stackexchange"; // a dictionary
 // include wink-nlp (lemmatizing)
@@ -37,7 +50,11 @@ export class Taggy {
   private mostFrequentTopTags: any[] = [];
   private timeout: any = null;
 
-  public options = {
+  public options: IOptions = {
+    submitButton: undefined,
+    frequencyOutput: undefined,
+    overrideOutput: undefined,
+    loaderElement: undefined,
     use_submit: false,
     waittime: 1000,
     assign_top: true,
@@ -45,25 +62,21 @@ export class Taggy {
     message_not_found: "No matching tag found",
     openthesaurus: false,
   };
-
+  //  * @param submitButton Optional: Submit button to trigger processing instead of automatic behavior while typing
+  //  * @param frequencyOutput Optional: Show frequency of identified tags
+  //  * @param overrideOutput Optional: Show identified top tags with possibility to override default detection
+  //  * @param loaderElement Optional: Add a loading indicator (spinner) that gets hidden on completion
+  
   /**
    * Create a new instance of taggy
    * @param inputField Input field where user text goes
    * @param outputField Output field where the tags will show up
-   * @param submitButton Optional: Submit button to trigger processing instead of automatic behavior while typing
-   * @param frequencyOutput Optional: Show frequency of identified tags
-   * @param overrideOutput Optional: Show identified top tags with possibility to override default detection
-   * @param loaderElement Optional: Add a loading indicator (spinner) that gets hidden on completion
    * @param options Optional: Provide options for taggy's behaviour
    */
   constructor(
     inputField: HTMLInputElement,
     outputField: HTMLInputElement,
-    submitButton?: HTMLElement,
-    frequencyOutput?: HTMLSpanElement,
-    overrideOutput?: HTMLInputElement,
-    loaderElement?: HTMLElement,
-    options?: Object
+    options?: IOptions
   ) {
     // if options get passed to constructor -> merge with existing options-object
     this.options = { ...this.options, ...options };
@@ -71,12 +84,12 @@ export class Taggy {
     // set demo-data for glossary
     this.glossaryData = glossaryData;
 
-    if (submitButton) this.setSubmitButton(submitButton);
+    if (options?.submitButton) this.setSubmitButton(options.submitButton);
     if (!inputField) throw new Error("No input-element provided for taggy");
     this.setInputField(inputField);
     if (!outputField) throw new Error("No output-element provided for taggy");
     this.outputField = outputField;
-    if (loaderElement) this.loaderElement = loaderElement;
+    if (options?.loaderElement) this.loaderElement = options.loaderElement;
     // this.submitButton = submitButton;
 
     this.winkTokenizer = new tokenizer();
@@ -86,11 +99,12 @@ export class Taggy {
     // if (this.outputField) this.outputField.setAttribute("readOnly", "true");
     // if (this.options.use_tagify) this.createTagify(this.outputField);
 
-    if (frequencyOutput) this.frequencyOutput = frequencyOutput;
+    if (options?.frequencyOutput)
+      this.frequencyOutput = options.frequencyOutput;
 
     // this.overrideOutput = overrideOutput;
-    if (overrideOutput) {
-      this.setOverrideOutput(overrideOutput);
+    if (options?.overrideOutput) {
+      this.setOverrideOutput(options.overrideOutput);
       // if (this.options.use_tagify) this.createTagifyOverride(overrideOutput);
     }
   }
