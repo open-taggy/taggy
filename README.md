@@ -78,7 +78,7 @@ The structure is as follows:
 
 ```
 ## Options
-You can add additional params on instanciation like this:
+You can add additional params on instantiation like this:
 ```node
 
 let taggy = new Taggy(inputElement, outputElement, { submitButton: submit, loaderElement: loaderDiv, includeTop: true });
