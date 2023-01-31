@@ -77,3 +77,22 @@ The structure is as follows:
 }
 
 ```
+## Options
+You can add additional params on instanciation like this:
+```node
+
+let taggy = new Taggy(inputElement, outputElement, { submitButton: submit, loaderElement: loaderDiv, includeTop: true });
+```
+
+| Parameter       | Type             | Info                                                                                                                               |
+|-----------------|------------------|------------------------------------------------------------------------------------------------------------------------------------|
+| submitButton    | HTMLElement      | Provided Element triggers analysis on click                                                                                        |
+| frequencyOutput | HTMLSpanElement  | Provided Element shows additional info on most occurencies of detected keywords                                                    |
+| overrideOutput  | HTMLInputElement | Provided Element shows detected tags if analysis is not unambiguous                                                                |
+| loaderElement   | HTMLElement      | Provided Element (loader/spinner), that gets hidden on completion                                                                  |
+| useSubmit       | boolean          | true -> analyze input while typing / false -> use of submit button to process ('submitButton' has to be defined) \| default: false |
+| waittime        | number           | Duration for the time to wait until tags show up \| default: 1000                                                                  |
+| assignTop       | boolean          | true -> return category of found keyword / false -> return the keyword itself \| default: true                                     |
+| includeTop      | boolean          | Include name of the categories themself as keywords \| default: false                                                              |
+| messageNotFound | string           | Customize the displayed message if no tag is found \| default "No matching tag found"                                              |
+| openthesaurus   | boolean          | Add call to openthesaurus API to enrich words (experimental) \| default: false                                                     |
