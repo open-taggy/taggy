@@ -11,11 +11,11 @@ export interface IOptions {
     frequencyOutput: HTMLSpanElement | undefined;
     overrideOutput: HTMLInputElement | undefined;
     loaderElement: HTMLElement | undefined;
-    use_submit: boolean;
+    useSubmit: boolean;
     waittime: number;
-    assign_top: boolean;
-    include_top: boolean;
-    message_not_found: string;
+    assignTop: boolean;
+    includeTop: boolean;
+    messageNotFound: string;
     openthesaurus: boolean;
 }
 export declare class Taggy {

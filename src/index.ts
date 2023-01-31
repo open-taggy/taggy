@@ -20,11 +20,11 @@ export interface IOptions {
   frequencyOutput: HTMLSpanElement | undefined;
   overrideOutput: HTMLInputElement | undefined;
   loaderElement: HTMLElement | undefined;
-  use_submit: boolean;
+  useSubmit: boolean;
   waittime: number;
-  assign_top: boolean;
-  include_top: boolean;
-  message_not_found: string;
+  assignTop: boolean;
+  includeTop: boolean;
+  messageNotFound: string;
   openthesaurus: boolean;
 }
 
@@ -55,18 +55,18 @@ export class Taggy {
     frequencyOutput: undefined,
     overrideOutput: undefined,
     loaderElement: undefined,
-    use_submit: false,
+    useSubmit: false,
     waittime: 1000,
-    assign_top: true,
-    include_top: false,
-    message_not_found: "No matching tag found",
+    assignTop: true,
+    includeTop: false,
+    messageNotFound: "No matching tag found",
     openthesaurus: false,
   };
   //  * @param submitButton Optional: Submit button to trigger processing instead of automatic behavior while typing
   //  * @param frequencyOutput Optional: Show frequency of identified tags
   //  * @param overrideOutput Optional: Show identified top tags with possibility to override default detection
   //  * @param loaderElement Optional: Add a loading indicator (spinner) that gets hidden on completion
-  
+
   /**
    * Create a new instance of taggy
    * @param inputField Input field where user text goes
@@ -84,7 +84,13 @@ export class Taggy {
     // set demo-data for glossary
     this.glossaryData = glossaryData;
 
-    if (options?.submitButton) this.setSubmitButton(options.submitButton);
+    if (options?.submitButton) {
+      this.setSubmitButton(options.submitButton);
+      this.options.useSubmit = true;
+    } else {
+      this.options.useSubmit = false;
+      this.options.waittime = 500;
+    }
     if (!inputField) throw new Error("No input-element provided for taggy");
     this.setInputField(inputField);
     if (!outputField) throw new Error("No output-element provided for taggy");
@@ -116,7 +122,7 @@ export class Taggy {
 
   setInputField(inputField: HTMLInputElement) {
     this.inputField = inputField;
-    if (this.options.use_submit && this.submitButton) {
+    if (this.options.useSubmit && this.submitButton) {
       return;
       // fall back to eventlistener when no submitbutton specified
     } else {
@@ -129,14 +135,14 @@ export class Taggy {
   setSubmitButton(submitButton: HTMLElement) {
     this.submitButton = submitButton;
     this.submitButton.addEventListener("click", (event) => {
-      if (this.options.use_submit) {
+      if (this.options.useSubmit) {
         this.handleSubmitButtonEventListener();
       }
     });
   }
 
   handleInputEventListener() {
-    if (this.options.use_submit) {
+    if (this.options.useSubmit) {
       return;
     }
     //
@@ -210,17 +216,17 @@ export class Taggy {
     return this.options;
   }
 
-  getGlossary(): IGlossaryData {
+  public getGlossary(): IGlossaryData {
     return this.glossaryData;
   }
 
-  setGlossary(glossaryToSet: IGlossaryData) {
+  public setGlossary(glossaryToSet: IGlossaryData) {
     this.glossaryData = glossaryToSet;
   }
 
-  setOption(option: string, value: boolean) {
-    if (option == "use_submit") {
-      this.options.use_submit = value;
+  public setOption(option: string, value: boolean) {
+    if (option == "useSubmit") {
+      this.options.useSubmit = value;
       if (value) {
         // this.handleSubmitButtonEventListener();
         this.setSubmitButton(this.submitButton);
@@ -239,14 +245,14 @@ export class Taggy {
         // this.handleInputEventListener();
       }
     }
-    if (option == "assign_top") {
-      this.options.assign_top = value;
+    if (option == "assignTop") {
+      this.options.assignTop = value;
     }
     if (option == "openthesaurus") {
       this.options.openthesaurus = value;
     }
-    if (option == "include_top") {
-      this.options.include_top = value;
+    if (option == "includeTop") {
+      this.options.includeTop = value;
     }
   }
 
@@ -293,8 +299,7 @@ export class Taggy {
     this.outputField.setAttribute("value", input);
     this.outputField.value = input;
 
-    if (this.options.message_not_found == "" && (!input || input == "")) {
-      console.log("RETURNIN");
+    if (this.options.messageNotFound == "" && (!input || input == "")) {
       return;
     }
 
@@ -303,7 +308,7 @@ export class Taggy {
     // taggyTag.id = "taggy-tag";
     taggyTag.classList.add("taggy-tag");
     if (!input || input == "") {
-      input = this.options.message_not_found;
+      input = this.options.messageNotFound;
       taggyTag.classList.add("tag-not-found");
     } else {
       // }
@@ -320,9 +325,21 @@ export class Taggy {
   }
 
   addFrequencyOutput() {
-    if (this.frequencyOutput)
-      this.frequencyOutput.innerHTML =
-        "Identified keywords: " + this.getMostFrequentWords()?.join(", ");
+    if (this.frequencyOutput) {
+      let frequencyList = [];
+      // delete previous added words
+      while (this.frequencyOutput.firstChild) {
+        this.frequencyOutput.removeChild(this.frequencyOutput.firstChild);
+      }
+      // add new words
+      this.getMostFrequentWords().forEach((word) => {
+        let frequencySpan = document.createElement("span");
+        frequencySpan.innerText = word;
+        frequencySpan.classList.add("taggy-frequency");
+        this.frequencyOutput?.appendChild(frequencySpan);
+      });
+      // .innerHTML = this.getMostFrequentWords()?.join(", ");
+    }
   }
 
   addOverrideOutput() {
@@ -338,7 +355,7 @@ export class Taggy {
           let taggyTagOverride = document.createElement("div");
           // taggyTag.classList.add("taggy-tag");
           // taggyTagOverride.id = "taggy-tag";
-          taggyTagOverride.classList.add("taggy-tag", "override");
+          taggyTagOverride.classList.add("taggy-tag", "taggy-override");
           taggyTagOverride.innerText = tag;
 
           this.overrideOutput.appendChild(taggyTagOverride);
@@ -411,7 +428,7 @@ export class Taggy {
 
     // if INCLUDE-TOP is set -> add top tag
     for (const category of this.glossaryData.tags) {
-      if (this.options.include_top) {
+      if (this.options.includeTop) {
         glossaryTags.push(normalizer(category.category));
       }
       for (const word of category.keywords) {
@@ -444,14 +461,14 @@ export class Taggy {
     let topTagCount: any = [];
 
     let maxCount = 0;
-    // if ASSIGN_TOP is set -> return top categegory
-    if (this.options.assign_top) {
+    // if assignTop is set -> return top categegory
+    if (this.options.assignTop) {
       let count = 0;
-      // if INCLUDE_TOP ist set -> add top categories
+      // if includeTop ist set -> add top categories
       this.glossaryData.tags.forEach((category: any) => {
         count = 0;
         finalSet.forEach((element) => {
-          // if INCLUDE_TOP ist set -> add top categories
+          // if includeTop ist set -> add top categories
           if (normalizer(category.category) == element) {
             count += 1;
           }
@@ -480,8 +497,8 @@ export class Taggy {
 
     let finalValue = sample(this.mostFrequentWords)!;
 
-    // if ASSIGN_TOP is set -> return top categegory
-    if (this.options.assign_top) {
+    // if assignTop is set -> return top categegory
+    if (this.options.assignTop) {
       let topTags: string[] = [];
       Object.values(this.mostFrequentTopTags).forEach((element) => {
         if (element.count) topTags.push(element.category);
