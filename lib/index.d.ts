@@ -13,6 +13,7 @@ export interface IOptions {
     loaderElement: HTMLElement | undefined;
     useSubmit: boolean;
     waittime: number;
+    language: "en";
     assignTop: boolean;
     includeTop: boolean;
     messageNotFound: string;
@@ -22,7 +23,7 @@ export declare class Taggy {
     name: string;
     private glossaryData;
     private winkTokenizer;
-    private stopwordsDE;
+    private stopwords;
     private openthesaurus;
     private inputField;
     private outputField;
@@ -44,6 +45,7 @@ export declare class Taggy {
     resetData(): void;
     setInputField(inputField: HTMLInputElement): void;
     setSubmitButton(submitButton: HTMLElement): void;
+    setLanguage(languageCode: string): void;
     handleInputEventListener(): void;
     handleSubmitButtonEventListener(): Promise<void>;
     setOutputField(outputField: HTMLInputElement): void;

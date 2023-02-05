@@ -1,5 +1,5 @@
 import tokenizer from "wink-tokenizer";
-import stopwords from "stopwords-iso";
+import stopwordsISO from "stopwords-iso";
 import normalizer from "normalize-for-search";
 import { sample, groupBy } from "lodash";
 import "regenerator-runtime/runtime";
@@ -20,6 +20,7 @@ export interface IOptions {
   loaderElement: HTMLElement | undefined;
   useSubmit: boolean;
   waittime: number;
+  language: "en";
   assignTop: boolean;
   includeTop: boolean;
   messageNotFound: string;
@@ -33,7 +34,7 @@ export class Taggy {
   public name: string = "taggy";
   private glossaryData: IGlossaryData;
   private winkTokenizer: tokenizer;
-  private stopwordsDE: any;
+  private stopwords: any;
   private openthesaurus: any;
   private inputField!: HTMLInputElement;
   private outputField!: HTMLInputElement;
@@ -52,6 +53,7 @@ export class Taggy {
     loaderElement: undefined,
     useSubmit: false,
     waittime: 1000,
+    language: "en",
     assignTop: true,
     includeTop: false,
     messageNotFound: "No matching tag found",
@@ -94,7 +96,8 @@ export class Taggy {
     // this.submitButton = submitButton;
 
     this.winkTokenizer = new tokenizer();
-    this.stopwordsDE = stopwords.de;
+    // set stopwords-language | defaults to en
+    this.setLanguage(this.options.language);
     this.openthesaurus = openthesaurus;
 
     if (options?.frequencyOutput)
@@ -129,6 +132,10 @@ export class Taggy {
         this.handleSubmitButtonEventListener();
       }
     });
+  }
+
+  setLanguage(languageCode: string) {
+    this.stopwords = stopwordsISO[languageCode];
   }
 
   handleInputEventListener() {
@@ -362,7 +369,7 @@ export class Taggy {
   }
 
   filterStopWords(inputArray: any[]) {
-    return inputArray.filter((item) => !this.stopwordsDE.includes(item.value));
+    return inputArray.filter((item) => !this.stopwords.includes(item.value));
   }
 
   async processInput(input: string): Promise<string[]> {
