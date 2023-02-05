@@ -1,10 +1,8 @@
 import tokenizer from "wink-tokenizer";
-import stopwords from "stopwords-iso"; // object of stopwords for multiple languages
-// import stopwordsDE from de; // german stopwords
+import stopwords from "stopwords-iso";
 import normalizer from "normalize-for-search";
 import { sample, groupBy } from "lodash";
 import "regenerator-runtime/runtime";
-//import synonyms from "germansynonyms";
 
 export interface IGlossaryData {
   tags: ITag[];
@@ -28,9 +26,6 @@ export interface IOptions {
   openthesaurus: boolean;
 }
 
-// import jargon from "@clipperhouse/jargon";
-// import stackexchange from "@clipperhouse/jargon/stackexchange"; // a dictionary
-// include wink-nlp (lemmatizing)
 const openthesaurus = require("openthesaurus");
 const glossaryData: IGlossaryData = require("../data/glossary.json");
 
@@ -102,16 +97,11 @@ export class Taggy {
     this.stopwordsDE = stopwords.de;
     this.openthesaurus = openthesaurus;
 
-    // if (this.outputField) this.outputField.setAttribute("readOnly", "true");
-    // if (this.options.use_tagify) this.createTagify(this.outputField);
-
     if (options?.frequencyOutput)
       this.frequencyOutput = options.frequencyOutput;
 
-    // this.overrideOutput = overrideOutput;
     if (options?.overrideOutput) {
       this.setOverrideOutput(options.overrideOutput);
-      // if (this.options.use_tagify) this.createTagifyOverride(overrideOutput);
     }
   }
 
@@ -145,23 +135,15 @@ export class Taggy {
     if (this.options.useSubmit) {
       return;
     }
-    //
-    // this.outputField.style.backgroundColor = "#f2f102";
     if (this.loaderElement)
       this.loaderElement.style.setProperty("display", "block");
-    // if (this.outputField.lastChild)
-    //   this.outputField.removeChild(this.outputField.lastChild!);
     this.deleteTags();
 
     clearTimeout(this.timeout);
 
     // make a new timeout set to go off in 1000ms
     this.timeout = setTimeout(async () => {
-      // loader.style.display = "block";
-
       await this.processAndAddTags(this.inputField.value, this.outputField);
-
-      // this.outputField.style.backgroundColor = "#ffffff";
       this.loaderElement?.style.setProperty("display", "none");
 
       // this.addTags(result);
@@ -228,21 +210,10 @@ export class Taggy {
     if (option == "useSubmit") {
       this.options.useSubmit = value;
       if (value) {
-        // this.handleSubmitButtonEventListener();
         this.setSubmitButton(this.submitButton);
-
-        // remove all event listeners from element
-        // this.inputField.replaceWith(this.inputField.cloneNode(true));
         this.setInputField(this.inputField);
-
-        // this.inputField.removeEventListener("input", (event) => {
-        //   this.handleInputEventListener();
-        // });
       } else {
         this.setInputField(this.inputField);
-
-        // this.submitButton.replaceWith(this.submitButton.cloneNode(true));
-        // this.handleInputEventListener();
       }
     }
     if (option == "assignTop") {
@@ -304,14 +275,11 @@ export class Taggy {
     }
 
     const taggyTag = document.createElement("div");
-    // taggyTag.classList.add("taggy-tag");
-    // taggyTag.id = "taggy-tag";
     taggyTag.classList.add("taggy-tag");
     if (!input || input == "") {
       input = this.options.messageNotFound;
       taggyTag.classList.add("tag-not-found");
     } else {
-      // }
       // set override tags
       if (this.overrideOutput && this.mostFrequentTopTags) {
         this.addOverrideOutput();
@@ -338,14 +306,12 @@ export class Taggy {
         frequencySpan.classList.add("taggy-frequency");
         this.frequencyOutput?.appendChild(frequencySpan);
       });
-      // .innerHTML = this.getMostFrequentWords()?.join(", ");
     }
   }
 
   addOverrideOutput() {
     let topTags: string[] = [];
     Object.values(this.mostFrequentTopTags).forEach((element) =>
-      // topTags.push(element.category + " (" + element.count + ")")
       topTags.push(element.category)
     );
     if (this.overrideOutput) {
@@ -353,8 +319,6 @@ export class Taggy {
         this.overrideOutput.setAttribute("value", topTags.join(", "));
         topTags.forEach((tag) => {
           let taggyTagOverride = document.createElement("div");
-          // taggyTag.classList.add("taggy-tag");
-          // taggyTagOverride.id = "taggy-tag";
           taggyTagOverride.classList.add("taggy-tag", "taggy-override");
           taggyTagOverride.innerText = tag;
 
@@ -404,7 +368,7 @@ export class Taggy {
   async processInput(input: string): Promise<string[]> {
     this.resetData();
 
-    // tokenize,filter out german stopword and normalize input (remove umlaute and transform to lowercase)
+    // tokenize, filter out german stopwords and normalize input (remove umlaute and transform to lowercase)
     let tokenizedValues = this.normalize(
       this.filterStopWords(this.tokenize(input, "word"))
     );
@@ -434,9 +398,9 @@ export class Taggy {
       for (const word of category.keywords) {
         glossaryTags.push(normalizer(word));
       }
-      // check input for words with whitespaces and "-"
     }
 
+    // check input for words with whitespaces and "-"
     for (const word of glossaryTags) {
       if (word.includes(" ") || word.includes("-")) {
         if (normalizer(input).includes(word)) {
@@ -483,8 +447,6 @@ export class Taggy {
         if (count > maxCount) maxCount = count;
       });
 
-      // console.log("SORTBY", sortBy(topTagCount, ["category", "count"]));
-
       // set most frequent top tags
       let groupedMostFrequentTopTags = groupBy(topTagCount, "count");
       if (groupedMostFrequentTopTags[maxCount][0].count) {
@@ -521,7 +483,6 @@ function enrichWithOpenThesaurus(inputArray: string[]) {
       if (response && response.baseforms) {
         enrichedArray.push(response.baseforms);
       }
-      // get baseforms from openthesaurus?
     });
   }
 
