@@ -92,7 +92,77 @@ let taggy = new Taggy(inputElement, outputElement, { submitButton: submit, loade
 | loaderElement   | HTMLElement      | Provided Element (loader/spinner), that gets hidden on completion                                                                  |
 | useSubmit       | boolean          | true -> analyze input while typing / false -> use of submit button to process ('submitButton' has to be defined) \| default: false |
 | waittime        | number           | Duration for the time to wait until tags show up \| default: 1000                                                                  |
+| language   | string      | Language Code in ISO 639-1; see list of available options below| default: "en"                                                                  |
 | assignTop       | boolean          | true -> return category of found keyword / false -> return the keyword itself \| default: true                                     |
 | includeTop      | boolean          | Include name of the categories themself as keywords \| default: false                                                              |
 | messageNotFound | string           | Customize the displayed message if no tag is found \| default "No matching tag found"                                              |
 | openthesaurus   | boolean          | Add call to openthesaurus API to enrich words (experimental) \| default: false                                                     |
+
+### Languages
+
+taggy is language agnostic. 
+
+But you should define it, so common/irrelevant words aka *stopwords* ("by", "a", "the", "also", "and", ...) in the input won't be processed.
+
+Source: https://www.npmjs.com/package/stopwords-iso
+
+| ISO 639-1 Code | Language |
+| -------------- | -------- |
+| af | Afrikaans |
+| ar | Arabic |
+| hy | Armenian |
+| eu | Basque |
+| bn | Bengali |
+| br | Breton |
+| bg | Bulgarian |
+| ca | Catalan; Valencian |
+| cs | Czech |
+| zh | Chinese |
+| da | Danish |
+| de | German |
+| nl | Dutch; Flemish |
+| el | Greek, Modern (1453-) |
+| en | English |
+| eo | Esperanto |
+| et | Estonian |
+| fa | Persian |
+| fi | Finnish |
+| fr | French |
+| ga | Irish |
+| gl | Galician |
+| gu | Gujarati |
+| ha | Hausa |
+| he | Hebrew |
+| hi | Hindi |
+| hr | Croatian |
+| hu | Hungarian |
+| id | Indonesian |
+| it | Italian |
+| ja | Japanese |
+| ko | Korean |
+| ku | Kurdish |
+| la | Latin |
+| lv | Latvian |
+| lt | Lithuanian |
+| mr | Marathi |
+| ms | Malay |
+| no | Norwegian |
+| pl | Polish |
+| pt | Portuguese |
+| ro | Romanian; Moldavian; Moldovan |
+| ru | Russian |
+| sk | Slovak |
+| sl | Slovenian |
+| so | Somali |
+| st | Sotho, Southern |
+| es | Spanish; Castilian |
+| sw | Swahili |
+| sv | Swedish |
+| tl | Tagalog |
+| th | Thai |
+| tr | Turkish |
+| uk | Ukrainian |
+| ur | Urdu |
+| vi | Vietnamese |
+| yo | Yoruba |
+| zu | Zulu |
