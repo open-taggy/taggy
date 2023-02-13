@@ -4,7 +4,7 @@
   <img width="240" alt="mtl-taggy" src="https://github.com/open-taggy/website/blob/main/static/img/logo.png">
 </p>
 <p align="center">
-taggy is a typescript-based frontend package to automatically tag (or categorize) textual content.
+taggy is a typescript-based frontend package to automatically tag (or categorize) textual content
 </p>
 
 ---
@@ -44,7 +44,7 @@ let taggy = new Taggy(inputElement, outputElement);
 
 - The output-element can be a html-tag of any kind, preferably `<div>`
 
-**Get your glossary ready and adjust it to your needs.**
+**Get your glossary ready and adjust it to your needs:**
 
 The default comes integrated under `/data/glossary.json` with the data shown below.
 But you definetly want to use your own :)
@@ -77,34 +77,52 @@ The structure is as follows:
 }
 
 ```
+**Retrieve detected single Tag:**
+
+The input-element which was provided on instatiation will receive the parameter "value" with the detected tag in it. For example:
+
+```html
+<div id="outputDiv" value="Economy">
+  <div class="taggy-tag">Economy</div>
+</div>
+```
+**Retrieve multiple Tags:**
+
+You can get multiple detected tags via the override-function, even when it's not visible to your users (e.g. "display: none"). Please make sure to turn it on (see options below). You'll get an element like this:
+
+```html
+<div id="override" value="Politics, Science">
+  <div class="taggy-tag taggy-override">Politics</div>
+  <div class="taggy-tag taggy-override">Science</div>
+</div>
+```
+
+
 ## Options
-You can add additional params on instantiation like this:
+You can add additional params when creating the taggy object:
 ```node
 
-let taggy = new Taggy(inputElement, outputElement, { submitButton: submit, loaderElement: loaderDiv, includeTop: true });
+let taggy = new Taggy(inputElement, outputElement, 
+{ submitButton: submit, loaderElement: loaderDiv, includeTop: true });
 ```
 
 | Parameter       | Type             | Info                                                                                                                               |
 |-----------------|------------------|------------------------------------------------------------------------------------------------------------------------------------|
-| submitButton    | HTMLElement      | Provided Element triggers analysis on click                                                                                        |
-| frequencyOutput | HTMLSpanElement  | Provided Element shows additional info on most occurencies of detected keywords                                                    |
-| overrideOutput  | HTMLInputElement | Provided Element shows detected tags if analysis is not unambiguous                                                                |
-| loaderElement   | HTMLElement      | Provided Element (loader/spinner), that gets hidden on completion                                                                  |
+| submitButton    | HTMLElement      | Element (button) triggers analysis on click                                                                                        |
+| frequencyOutput | HTMLSpanElement  | Element contains additional info on most occurencies of detected keywords                                                    |
+| overrideOutput  | HTMLInputElement | Element shows multiple detected tags if analysis is not unambiguous                                                                |
+| loaderElement   | HTMLElement      | Element (loader/spinner) that gets hidden on completion                                                                  |
 | useSubmit       | boolean          | true -> analyze input while typing / false -> use of submit button to process ('submitButton' has to be defined) \| default: false |
 | waittime        | number           | Duration for the time to wait until tags show up \| default: 1000                                                                  |
 | language   | string      | Language Code in ISO 639-1; see list of available options below| default: "en"                                                                  |
 | assignTop       | boolean          | true -> return category of found keyword / false -> return the keyword itself \| default: true                                     |
 | includeTop      | boolean          | Include name of the categories themself as keywords \| default: false                                                              |
-| messageNotFound | string           | Customize the displayed message if no tag is found \| default "No matching tag found"                                              |
+| messageNotFound | string           | Customize displayed message if no tag is found \| default "No matching tag found"                                              |
 | openthesaurus   | boolean          | Add call to openthesaurus API to enrich words (experimental) \| default: false                                                     |
 
-### Languages
+## Languages
 
-taggy is language agnostic. 
-
-But you should define it, so common/irrelevant words aka *stopwords* ("by", "a", "the", "also", "and", ...) in the input won't be processed.
-
-Source: https://www.npmjs.com/package/stopwords-iso
+taggy is language agnostic. But it's advised to define it, so common (and for this task irrelevant words) aka *stopwords* ("by", "a", "the", "also", "and", ...) in the input won't be processed. Below list from [here](https://www.npmjs.com/package/stopwords-iso)
 
 | ISO 639-1 Code | Language |
 | -------------- | -------- |
