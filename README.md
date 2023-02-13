@@ -119,6 +119,31 @@ let taggy = new Taggy(inputElement, outputElement,
 | includeTop      | boolean          | Include name of the categories themself as keywords \| default: false                                                              |
 | messageNotFound | string           | Customize displayed message if no tag is found \| default "No matching tag found"                                              |
 | openthesaurus   | boolean          | Add call to openthesaurus API to enrich words (experimental) \| default: false                                                     |
+## Framework Integration
+
+### Angular
+
+This is a basic example on how you can integrate taggy into an Angular-project:
+
+**In your HTML-Template:**
+```html
+    <input type="text" #taggyInput />
+    <div #taggyOutput></div>
+```
+**In your .ts-file:**
+```ts
+  import { ViewChild, ElementRef } from "@angular/core";
+  import { Taggy } from "@b1tsteller/taggy";
+
+  ...
+  @ViewChild("taggyInput") taggyInput: ElementRef;
+  @ViewChild("taggyOutput") taggyOutput: ElementRef;
+  
+  ...
+   ngAfterViewInit() {
+    let taggyObject = new Taggy(this.taggyInput.nativeElement, this.taggyOutput.nativeElement);
+  }
+```
 
 ## Languages
 
