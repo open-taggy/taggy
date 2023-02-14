@@ -56,8 +56,10 @@ import myGlossary from "../data/my-glossary.json";
 
 taggy.setGlossary(myGlossary);
 ```
-
+<a name="taggy-glossary">
 The structure is as follows:
+</a>
+
 ```json
 {
   "tags": [
@@ -77,6 +79,7 @@ The structure is as follows:
 }
 
 ```
+
 **Retrieve detected single Tag:**
 
 The input-element which was provided on instatiation will receive the parameter "value" with the detected tag in it. For example:
@@ -127,27 +130,30 @@ This is a basic example on how you can integrate taggy into an Angular-project:
 
 **In your HTML-Template:**
 ```html
-    <input type="text" #taggyInput />
-    <div #taggyOutput></div>
+<input type="text" #taggyInput />
+<div #taggyOutput></div>
 ```
 **In your .ts-file:**
 ```ts
-  import { ViewChild, ElementRef } from "@angular/core";
-  import { Taggy } from "@b1tsteller/taggy";
+import { ViewChild, ElementRef } from "@angular/core";
+import { Taggy } from "@b1tsteller/taggy";
 
-  ...
-  @ViewChild("taggyInput") taggyInput: ElementRef;
-  @ViewChild("taggyOutput") taggyOutput: ElementRef;
-  
-  ...
-   ngAfterViewInit() {
-    let taggyObject = new Taggy(this.taggyInput.nativeElement, this.taggyOutput.nativeElement);
-  }
+...
+@ViewChild("taggyInput") taggyInput: ElementRef;
+@ViewChild("taggyOutput") taggyOutput: ElementRef;
+
+...
+ngAfterViewInit() {
+  let taggyObject = new Taggy(this.taggyInput.nativeElement, this.taggyOutput.nativeElement);
+}
 ```
 
 ## Languages
 
 taggy is language agnostic. But it's advised to define it, so common (and for this task irrelevant words) aka *stopwords* ("by", "a", "the", "also", "and", ...) in the input won't be processed. Below list from [here](https://www.npmjs.com/package/stopwords-iso)
+
+<details><summary>ISO 639-1 Language List</summary>
+<br>
 
 | ISO 639-1 Code | Language |
 | -------------- | -------- |
@@ -209,3 +215,15 @@ taggy is language agnostic. But it's advised to define it, so common (and for th
 | vi | Vietnamese |
 | yo | Yoruba |
 | zu | Zulu |
+
+</details>
+
+## Glossary Building
+
+If you don't have your own glossary ready to feed taggy, you can build your own with a service like this https://freetools.textmagic.com/word-cloud-generator and the following steps:
+
+1. Paste all of your existing training/example texts **for one category** into the input field
+2. Hit "Generate" and receive the wordcloud for this category
+3. Click download as CSV and you have your keywords ready
+4. Put the most frequent ones into your [taggy glossary-JSON](#taggy-glossary)
+5. Repeat steps 1 - 4 for all your other categories
